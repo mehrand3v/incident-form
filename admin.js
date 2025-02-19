@@ -24,11 +24,23 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-// Get table and filter elements
+// Get elements
 const incidentsTable = document.getElementById("incidentsTable");
 const dateFilter = document.getElementById("dateFilter");
 const statusFilter = document.getElementById("statusFilter");
 const storeFilter = document.getElementById("storeFilter");
+const incidentTypeFilter = document.getElementById("incidentTypeFilter");
+const modal = document.getElementById("detailsModal");
+const modalContent = document.getElementById("modalContent");
+const closeModal = document.querySelector(".close-modal");
+
+// Modal handlers
+closeModal.onclick = () => (modal.style.display = "none");
+window.onclick = (event) => {
+  if (event.target === modal) {
+    modal.style.display = "none";
+  }
+};
 
 // Format date
 const formatDate = (timestamp) => {
@@ -37,11 +49,28 @@ const formatDate = (timestamp) => {
   return date.toLocaleDateString() + " " + date.toLocaleTimeString();
 };
 
-// Create incident type badges
+// Create incident type spans
 const createIncidentTypeBadges = (types) => {
   return types
     .map((type) => `<span class="incident-type">${type}</span>`)
     .join("");
+};
+
+// Populate incident type filter
+const populateIncidentTypeFilter = (incidents) => {
+  const types = new Set();
+  incidents.forEach((doc) => {
+    const data = doc.data();
+    data.incidentTypes.forEach((type) => types.add(type));
+  });
+
+  incidentTypeFilter.innerHTML = '<option value="all">All Types</option>';
+  [...types].sort().forEach((type) => {
+    const option = document.createElement("option");
+    option.value = type;
+    option.textContent = type;
+    incidentTypeFilter.appendChild(option);
+  });
 };
 
 // Load and display incidents
@@ -55,6 +84,9 @@ const loadIncidents = () => {
     const tbody = incidentsTable.querySelector("tbody");
     tbody.innerHTML = "";
 
+    // Populate incident type filter
+    populateIncidentTypeFilter(snapshot.docs);
+
     snapshot.forEach((doc) => {
       const data = doc.data();
       const tr = document.createElement("tr");
@@ -65,7 +97,9 @@ const loadIncidents = () => {
                 <td class="incident-types">${createIncidentTypeBadges(
                   data.incidentTypes
                 )}</td>
-                <td>${data.details}</td>
+                <td class="details-cell" onclick="window.showDetails('${encodeURIComponent(
+                  data.details
+                )}')">${data.details}</td>
                 <td class="status-${data.status}">${data.status}</td>
                 <td class="actions">
                     <button onclick="window.updateStatus('${doc.id}', '${
@@ -82,7 +116,15 @@ const loadIncidents = () => {
 
       tbody.appendChild(tr);
     });
+
+    applyFilters();
   });
+};
+
+// Show details modal
+window.showDetails = (details) => {
+  modalContent.textContent = decodeURIComponent(details);
+  modal.style.display = "block";
 };
 
 // Update incident status
@@ -103,12 +145,14 @@ const applyFilters = () => {
   const dateValue = dateFilter.value;
   const statusValue = statusFilter.value;
   const storeValue = storeFilter.value.toLowerCase();
+  const typeValue = incidentTypeFilter.value;
 
   rows.forEach((row) => {
     let show = true;
     const date = new Date(row.cells[0].textContent);
     const status = row.cells[4].textContent;
     const store = row.cells[1].textContent.toLowerCase();
+    const types = row.cells[2].textContent;
 
     // Date filter
     if (dateValue !== "all") {
@@ -141,6 +185,11 @@ const applyFilters = () => {
       show = false;
     }
 
+    // Incident type filter
+    if (typeValue !== "all" && !types.includes(typeValue)) {
+      show = false;
+    }
+
     row.style.display = show ? "" : "none";
   });
 };
@@ -149,6 +198,7 @@ const applyFilters = () => {
 dateFilter.addEventListener("change", applyFilters);
 statusFilter.addEventListener("change", applyFilters);
 storeFilter.addEventListener("input", applyFilters);
+incidentTypeFilter.addEventListener("change", applyFilters);
 
 // Initialize the dashboard
 loadIncidents();
