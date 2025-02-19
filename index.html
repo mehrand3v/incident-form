@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Incident Report QR Code</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <!-- QR Code library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <style>
+        html,body{
+            height: 100%;
+            overflow: hidden;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #212121;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            background: linear-gradient(#212121, #212121) padding-box,
+                linear-gradient(145deg, transparent 35%, #e81cff, #40c9ff) border-box;
+            border: 2px solid transparent;
+            border-radius: 16px;
+            padding: 32px;
+            max-width: 500px;
+            width: 100%;
+            box-sizing: border-box;
+            text-align: center;
+            margin-top: 40px;
+            animation: gradient 5s ease infinite;
+            box-shadow: 0 0 25px rgba(232, 28, 255, 0.15);
+        }
+
+        @keyframes gradient {
+            0% {
+                background-position: 0% 50%;
+            }
+
+            50% {
+                background-position: 100% 50%;
+            }
+
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        .title {
+            font-size: 28px;
+            font-weight: 800;
+            margin-bottom: 30px;
+            text-transform: uppercase;
+            letter-spacing: -0.5px;
+        }
+
+        .qr-container {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            display: inline-block;
+            margin-bottom: 20px;
+        }
+
+        .instructions {
+            color: #9e9e9e;
+            font-size: 14px;
+            line-height: 1.6;
+            margin: 20px 0;
+        }
+
+        .button {
+            position: relative;
+            text-decoration: none;
+            color: #fff;
+            background: linear-gradient(45deg, #0ce39a, #69007f, #fc0987);
+            padding: 14px 25px;
+            border-radius: 10px;
+            font-size: 1.25em;
+            cursor: pointer;
+            display: inline-block;
+            margin: 10px;
+        }
+
+        .button span {
+            position: relative;
+            z-index: 1;
+        }
+
+        .button::before {
+            content: "";
+            position: absolute;
+            inset: 1px;
+            background: #272727;
+            border-radius: 9px;
+            transition: 0.5s;
+        }
+
+        .button:hover::before {
+            opacity: 0.7;
+        }
+
+        .button::after {
+            content: "";
+            position: absolute;
+            inset: 0px;
+            background: linear-gradient(45deg, #0ce39a, #69007f, #fc0987);
+            border-radius: 9px;
+            transition: 0.5s;
+            opacity: 0;
+            filter: blur(20px);
+        }
+
+        .button:hover:after {
+            opacity: 1;
+        }
+
+        .navbar {
+            width: 100%;
+            max-width: 500px;
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 20px;
+        }
+
+        .download-btn {
+            background: none;
+            border: 1px solid #e81cff;
+            color: #e81cff;
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-top: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .download-btn:hover {
+            background: #e81cff;
+            color: white;
+        }
+
+        #qrCode {
+            margin: 0 auto;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="navbar">
+        <a href="admin.html" class="button">
+            <span>Admin Dashboard</span>
+        </a>
+    </div>
+
+    <div class="container">
+        <h1 class="title">Incident Report QR Code</h1>
+        <div class="qr-container">
+            <div id="qrCode"></div>
+        </div>
+        <p class="instructions">
+            Scan this QR code to access the incident report form.<br>
+            Place this QR code in accessible locations around the store.
+        </p>
+        <button class="download-btn" onclick="downloadQR()">Download QR Code</button>
+    </div>
+
+    <script>
+        // Function to get the current URL's base path
+        function getBasePath() {
+            const pathArray = window.location.pathname.split('/');
+            pathArray.pop(); // Remove current file name
+            return window.location.origin + pathArray.join('/') + '/signin.html';
+        }
+
+        // Create QR Code
+        const qr = new QRCode(document.getElementById("qrCode"), {
+            text: getBasePath(),
+            width: 256,
+            height: 256,
+            colorDark: "#000000",
+            colorLight: "#ffffff",
+            correctLevel: QRCode.CorrectLevel.H
+        });
+
+        // Function to download QR code
+        function downloadQR() {
+            const canvas = document.querySelector("#qrCode canvas");
+            const link = document.createElement("a");
+            link.download = "incident-report-qr.png";
+            link.href = canvas.toDataURL("image/png");
+            link.click();
+        }
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Incident Report</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        html,
+        body {
+            overflow: hidden;
+            height: 100%;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            /* font-family: "Lucida Sans", "Lucida Sans Regular", "Lucida Grande",
+        "Lucida Sans Unicode", Geneva, Verdana, sans-serif; */
+            letter-spacing: 1.1px;
+            background: #212121;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+
+        .form-container {
+            width: 450px;
+            background: linear-gradient(#212121, #212121) padding-box,
+                linear-gradient(145deg, transparent 35%, #e81cff, #40c9ff) border-box;
+            border: 2px solid transparent;
+            padding: 36px 32px;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            gap: 28px;
+            box-sizing: border-box;
+            border-radius: 16px;
+            background-size: 200% 100%;
+            animation: gradient 5s ease infinite;
+            box-shadow: 0 0 25px rgba(232, 28, 255, 0.15);
+        }
+
+        @keyframes gradient {
+            0% {
+                background-position: 0% 50%;
+            }
+
+            50% {
+                background-position: 100% 50%;
+            }
+
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        .form-container h2 {
+            margin: 0 0 8px 0;
+            font-size: 1.75rem;
+            text-align: center;
+            font-weight: 600;
+            letter-spacing: -0.5px;
+            color: #fff;
+            text-transform: uppercase;
+            padding-bottom: 8px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin: 0 4px;
+        }
+
+        .form-group+.form-group {
+            margin-top: 24px;
+        }
+
+        .form-group label {
+            font-size: 14px;
+            font-weight: 500;
+            color: #9e9e9e;
+            letter-spacing: 0.3px;
+            padding-left: 4px;
+        }
+
+        .form-group input[type="text"],
+        .form-group textarea {
+            width: 100%;
+            padding: 12px 14px;
+            border-radius: 8px;
+            background-color: rgba(255, 255, 255, 0.03);
+            border: 1px solid #414141;
+            color: #fff;
+            font-size: 14px;
+            font-family: 'Inter', sans-serif;
+            box-sizing: border-box;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+
+        .form-group input[type="text"]:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #e81cff;
+            box-shadow: 0 0 0 2px rgba(232, 28, 255, 0.1);
+        }
+
+        .form-group textarea {
+            min-height: 120px;
+            resize: vertical;
+            margin-bottom: 8px;
+        }
+
+        .checkbox-container {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            padding: 8px 4px;
+            margin-bottom: 8px;
+        }
+
+        .checkbox-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .checkbox {
+            display: none;
+        }
+
+        .checkbox-label {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        .checkbox-flip {
+            width: 48px;
+            height: 48px;
+            perspective: 1000px;
+        }
+
+        .checkbox-front,
+        .checkbox-back {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 12px;
+            backface-visibility: hidden;
+            transition: transform 0.3s ease;
+        }
+
+        .checkbox-front {
+            background: linear-gradient(135deg, #ff6347, #f76c6c);
+            transform: rotateY(0deg);
+        }
+
+        .checkbox-back {
+            background: linear-gradient(135deg, #36b54a, #00c1d4);
+            transform: rotateY(180deg);
+        }
+
+        .checkbox:checked+.checkbox-label .checkbox-front {
+            transform: rotateY(180deg);
+        }
+
+        .checkbox:checked+.checkbox-label .checkbox-back {
+            transform: rotateY(0deg);
+        }
+
+        .checkbox-text {
+            font-size: 14px;
+            color: #fff;
+            font-weight: 500;
+        }
+
+        .icon-path {
+            stroke: white;
+            stroke-width: 2;
+            fill: transparent;
+        }
+
+        .form-submit-btn {
+            align-self: center;
+            background: #313131;
+            border: 1px solid #414141;
+            padding: 14px 32px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #9e9e9e;
+            border-radius: 8px;
+            cursor: pointer;
+            width: 50%;
+            transition: all 0.3s ease;
+            margin-top: 16px;
+        }
+
+        .form-submit-btn:hover {
+            background: #e81cff;
+            border-color: #e81cff;
+            color: #fff;
+            box-shadow: 0 0 15px rgba(232, 28, 255, 0.3);
+        }
+
+        /* From Uiverse.io by nima-mollazadeh */
+        .button {
+            position: relative;
+            text-decoration: none;
+            color: #fff;
+            background: linear-gradient(45deg, #0ce39a, #69007f, #fc0987);
+            padding: 14px 25px;
+            border-radius: 10px;
+            font-size: 1.25em;
+            cursor: pointer;
+        }
+
+        .button span {
+            position: relative;
+            z-index: 1;
+        }
+
+        .button::before {
+            content: "";
+            position: absolute;
+            inset: 1px;
+            background: #272727;
+            border-radius: 9px;
+            transition: 0.5s;
+        }
+
+        .button:hover::before {
+            opacity: 0.7;
+        }
+
+        .button::after {
+            content: "";
+            position: absolute;
+            inset: 0px;
+            background: linear-gradient(45deg, #0ce39a, #69007f, #fc0987);
+            border-radius: 9px;
+            transition: 0.5s;
+            opacity: 0;
+            filter: blur(20px);
+        }
+
+        .button:hover:after {
+            opacity: 1;
+        }
+
+        .title {
+            text-align: center;
+            font-family: "Lucida Sans", "Lucida Sans Regular", "Lucida Grande",
+                "Lucida Sans Unicode", Geneva, Verdana, sans-serif;
+            margin: 10px 0 30px 0;
+            font-size: 28px;
+            font-weight: 800;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="form-container">
+        <h2 class="title">Security Incident Log</h2>
+        <form id="incidentForm">
+            <div class="form-group">
+                <label for="storeNumber">Store Number</label>
+                <input type="text" id="storeNumber" name="storeNumber" placeholder="Enter store number" required>
+            </div>
+
+            <div class="form-group">
+                <label>Incident Type</label>
+                <div class="checkbox-container">
+                    <div class="checkbox-wrapper">
+                        <input class="checkbox" id="shoplifting" name="incidentType" type="checkbox"
+                            value="shoplifting">
+                        <label class="checkbox-label" for="shoplifting">
+                            <div class="checkbox-flip">
+                                <div class="checkbox-front">
+                                    <svg fill="white" height="24" width="24" viewBox="0 0 24 24">
+                                        <path d="M19 13H12V19H11V13H5V12H11V6H12V12H19V13Z" class="icon-path"></path>
+                                    </svg>
+                                </div>
+                                <div class="checkbox-back">
+                                    <svg fill="white" height="24" width="24" viewBox="0 0 24 24">
+                                        <path d="M9 19l-7-7 1.41-1.41L9 16.17l11.29-11.3L22 6l-13 13z"
+                                            class="icon-path"></path>
+                                    </svg>
+                                </div>
+                            </div>
+                        </label>
+                        <span class="checkbox-text">Shoplifting</span>
+                    </div>
+
+                    <div class="checkbox-wrapper">
+                        <input class="checkbox" id="robbery" name="incidentType" type="checkbox" value="robbery">
+                        <label class="checkbox-label" for="robbery">
+                            <div class="checkbox-flip">
+                                <div class="checkbox-front">
+                                    <svg fill="white" height="24" width="24" viewBox="0 0 24 24">
+                                        <path d="M19 13H12V19H11V13H5V12H11V6H12V12H19V13Z" class="icon-path"></path>
+                                    </svg>
+                                </div>
+                                <div class="checkbox-back">
+                                    <svg fill="white" height="24" width="24" viewBox="0 0 24 24">
+                                        <path d="M9 19l-7-7 1.41-1.41L9 16.17l11.29-11.3L22 6l-13 13z"
+                                            class="icon-path"></path>
+                                    </svg>
+                                </div>
+                            </div>
+                        </label>
+                        <span class="checkbox-text">Robbery</span>
+                    </div>
+
+                    <div class="checkbox-wrapper">
+                        <input class="checkbox" id="beer-run" name="incidentType" type="checkbox" value="beer-run">
+                        <label class="checkbox-label" for="beer-run">
+                            <div class="checkbox-flip">
+                                <div class="checkbox-front">
+                                    <svg fill="white" height="24" width="24" viewBox="0 0 24 24">
+                                        <path d="M19 13H12V19H11V13H5V12H11V6H12V12H19V13Z" class="icon-path"></path>
+                                    </svg>
+                                </div>
+                                <div class="checkbox-back">
+                                    <svg fill="white" height="24" width="24" viewBox="0 0 24 24">
+                                        <path d="M9 19l-7-7 1.41-1.41L9 16.17l11.29-11.3L22 6l-13 13z"
+                                            class="icon-path"></path>
+                                    </svg>
+                                </div>
+                            </div>
+                        </label>
+                        <span class="checkbox-text">Beer-run</span>
+                    </div>
+
+                    <div class="checkbox-wrapper">
+                        <input class="checkbox" id="property-damage" name="incidentType" type="checkbox"
+                            value="property-damage">
+                        <label class="checkbox-label" for="property-damage">
+                            <div class="checkbox-flip">
+                                <div class="checkbox-front">
+                                    <svg fill="white" height="24" width="24" viewBox="0 0 24 24">
+                                        <path d="M19 13H12V19H11V13H5V12H11V6H12V12H19V13Z" class="icon-path"></path>
+                                    </svg>
+                                </div>
+                                <div class="checkbox-back">
+                                    <svg fill="white" height="24" width="24" viewBox="0 0 24 24">
+                                        <path d="M9 19l-7-7 1.41-1.41L9 16.17l11.29-11.3L22 6l-13 13z"
+                                            class="icon-path"></path>
+                                    </svg>
+                                </div>
+                            </div>
+                        </label>
+                        <span class="checkbox-text">Property Damage</span>
+                    </div>
+
+                    <div class="checkbox-wrapper">
+                        <input class="checkbox" id="harassment" name="incidentType" type="checkbox" value="harassment">
+                        <label class="checkbox-label" for="harassment">
+                            <div class="checkbox-flip">
+                                <div class="checkbox-front">
+                                    <svg fill="white" height="24" width="24" viewBox="0 0 24 24">
+                                        <path d="M19 13H12V19H11V13H5V12H11V6H12V12H19V13Z" class="icon-path"></path>
+                                    </svg>
+                                </div>
+                                <div class="checkbox-back">
+                                    <svg fill="white" height="24" width="24" viewBox="0 0 24 24">
+                                        <path d="M9 19l-7-7 1.41-1.41L9 16.17l11.29-11.3L22 6l-13 13z"
+                                            class="icon-path"></path>
+                                    </svg>
+                                </div>
+                            </div>
+                        </label>
+                        <span class="checkbox-text">Harassment</span>
+                    </div>
+
+                    <div class="checkbox-wrapper">
+                        <input class="checkbox" id="injury" name="incidentType" type="checkbox" value="injury">
+                        <label class="checkbox-label" for="injury">
+                            <div class="checkbox-flip">
+                                <div class="checkbox-front">
+                                    <svg fill="white" height="24" width="24" viewBox="0 0 24 24">
+                                        <path d="M19 13H12V19H11V13H5V12H11V6H12V12H19V13Z" class="icon-path"></path>
+                                    </svg>
+                                </div>
+                                <div class="checkbox-back">
+                                    <svg fill="white" height="24" width="24" viewBox="0 0 24 24">
+                                        <path d="M9 19l-7-7 1.41-1.41L9 16.17l11.29-11.3L22 6l-13 13z"
+                                            class="icon-path"></path>
+                                    </svg>
+                                </div>
+                            </div>
+                        </label>
+                        <span class="checkbox-text">Injury</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="details">Details</label>
+                <textarea id="details" name="details" placeholder="Enter incident details here..." required></textarea>
+            </div>
+
+            <!-- <button type="submit" class="form-submit-btn">Submit Report</button> -->
+            <!-- From Uiverse.io by nima-mollazadeh -->
+            <button class="button form-submit-btn" type="submit">
+                <span>Submit Report</span>
+            </button>
+
+        </form>
+    </div>
+    <div style="position: fixed; top: 20px; right: 20px;">
+        <a href="admin.html" class="button" style="text-decoration: none;">
+            <span>Admin Dashboard</span>
+        </a>
+    </div>
+    <script type="module" src="signin.js"></script>
+</body>
+
+</html>
