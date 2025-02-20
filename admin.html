@@ -866,6 +866,23 @@ tr {
 </head>
 
 <body>
+    <script>
+    const checkAuth = () => {
+    if (sessionStorage.getItem('adminAuthenticated') !== 'true') {
+    window.location.href = 'admin-login.html';
+    }
+    };
+
+    // Run the check immediately when the page loads
+    checkAuth();
+
+    // Also check when the page becomes visible again (in case of browser back/forward)
+    document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible') {
+    checkAuth();
+    }
+    });
+    </script>
     <div class="dashboard-container">
     <div class="navbar">
         <h1 class="title">Incident Reports Dashboard</h1>

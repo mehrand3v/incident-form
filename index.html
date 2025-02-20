@@ -287,7 +287,16 @@
             link.href = canvas.toDataURL("image/png");
             link.click();
         }
+document.querySelector('.navbar a').addEventListener('click', (e) => {
+    e.preventDefault();
 
+    // Check if already authenticated
+    if (sessionStorage.getItem('adminAuthenticated') === 'true') {
+        window.location.href = 'admin.html';
+    } else {
+        window.location.href = 'admin-login.html';
+    }
+});
         // Function to print QR code
         function printQR() {
             window.print();
