@@ -83,7 +83,6 @@ const detailsInput = document.getElementById("details");
 const checkboxes = document.querySelectorAll('input[name="incidentType"]');
 
 // Set initial store number value and position cursor at the end
-storeNumberInput.value = "274";
 storeNumberInput.addEventListener("focus", function () {
   const len = this.value.length;
   this.setSelectionRange(len, len);
@@ -91,13 +90,35 @@ storeNumberInput.addEventListener("focus", function () {
 
 // Form validation functions
 const validateStoreNumber = (value) => {
-  const storeNumberRegex = /^\d{1,8}$/; // Accepts 1-8 digits
+  const storeNumberRegex = /^\d{7}$/; // Must be exactly 7 digits
   return storeNumberRegex.test(value.trim());
 };
+// Real-time validation for store number
+storeNumberInput.addEventListener("input", (e) => {
+  // Only allow digits
+  e.target.value = e.target.value.replace(/\D/g, '');
 
+  // Limit to 7 digits
+  if (e.target.value.length > 7) {
+    e.target.value = e.target.value.slice(0, 7);
+  }
+
+  if (!validateStoreNumber(storeNumberInput.value)) {
+    showError(storeNumberInput, "Please enter a 7-digit store number");
+  } else {
+    clearError(storeNumberInput);
+  }
+});
 const validateIncidentTypes = () => {
   return Array.from(checkboxes).some((checkbox) => checkbox.checked);
 };
+// Add this function after your other validation functions
+
+
+// Clear warning message function
+
+
+// Add event listener for details input
 
 // Show error message
 const showError = (element, message) => {
@@ -124,30 +145,158 @@ const clearError = (element) => {
 };
 
 // Real-time validation for store number only
-storeNumberInput.addEventListener("input", () => {
-  if (!validateStoreNumber(storeNumberInput.value)) {
-    showError(
-      storeNumberInput,
-      "Please enter a valid store number (1-5 digits)"
-    );
-  } else {
-    clearError(storeNumberInput);
-  }
-});
+
+// Prevent user from deleting "274"
+
 
 // Form submission handler
+// Add styles for the confirmation dialog
+const modalStyle = document.createElement("style");
+modalStyle.textContent = `
+  .modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  .modal-overlay.show {
+    opacity: 1;
+  }
+
+  .modal-content {
+    background: linear-gradient(#212121, #212121) padding-box,
+                linear-gradient(145deg, transparent 35%, #e81cff, #40c9ff) border-box;
+    border: 2px solid transparent;
+    border-radius: 16px;
+    padding: 24px;
+    width: 90%;
+    max-width: 400px;
+    color: white;
+    transform: translateY(-20px);
+    transition: transform 0.3s ease;
+  }
+
+  .modal-overlay.show .modal-content {
+    transform: translateY(0);
+  }
+
+  .modal-title {
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 16px;
+    color: #fff;
+  }
+
+  .modal-message {
+    font-size: 14px;
+    margin-bottom: 24px;
+    color: #9e9e9e;
+  }
+
+  .modal-buttons {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+  }
+
+  .modal-button {
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background: #313131;
+    border: 1px solid #414141;
+    color: #9e9e9e;
+  }
+
+  .modal-button:hover {
+    background: #e81cff;
+    border-color: #e81cff;
+    color: #fff;
+    box-shadow: 0 0 15px rgba(232, 28, 255, 0.3);
+  }
+
+  .modal-button.confirm {
+    background: linear-gradient(135deg, #36b54a, #00c1d4);
+    border: none;
+    color: white;
+  }
+`;
+document.head.appendChild(modalStyle);
+
+// Create modal elements
+const createModal = () => {
+  const modal = document.createElement('div');
+  modal.className = 'modal-overlay';
+  modal.innerHTML = `
+    <div class="modal-content">
+      <div class="modal-title">Confirm Submission</div>
+      <div class="modal-message">You haven't provided any details. Are you sure you want to continue?</div>
+      <div class="modal-buttons">
+        <button class="modal-button" data-action="cancel">Cancel</button>
+        <button class="modal-button confirm" data-action="confirm">Continue</button>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(modal);
+  return modal;
+};
+
+// Show modal function
+const showConfirmationDialog = () => {
+  return new Promise((resolve) => {
+    const modal = createModal();
+
+    // Animation frame for smooth transition
+    requestAnimationFrame(() => {
+      modal.classList.add('show');
+    });
+
+    const handleClick = (e) => {
+      const action = e.target.dataset.action;
+      if (action) {
+        modal.classList.remove('show');
+        setTimeout(() => {
+          modal.remove();
+        }, 300);
+        resolve(action === 'confirm');
+      }
+    };
+
+    modal.addEventListener('click', handleClick);
+  });
+};
+
+// Modify the validateDetails function
+const validateDetails = async (details) => {
+  if (!details.trim()) {
+    return await showConfirmationDialog();
+  }
+  return true;
+};
+
+// Update form submission handler
 incidentForm.addEventListener("submit", async (e) => {
   e.preventDefault();
   console.log("Form submitted");
+  document.querySelectorAll(".error-message").forEach((msg) => msg.remove());
 
   // Validate fields
   let isValid = true;
 
   if (!validateStoreNumber(storeNumberInput.value)) {
-    showError(
-      storeNumberInput,
-      "Please enter a valid store number (1-5 digits)"
-    );
+    showError(storeNumberInput, "Please enter 7 digits for the store number");
     isValid = false;
   }
 
@@ -162,10 +311,11 @@ incidentForm.addEventListener("submit", async (e) => {
     return;
   }
 
-  // Get selected incident types
-  const selectedIncidentTypes = Array.from(checkboxes)
-    .filter((checkbox) => checkbox.checked)
-    .map((checkbox) => checkbox.value);
+  // Check details with confirmation dialog
+  const shouldProceed = await validateDetails(detailsInput.value);
+  if (!shouldProceed) {
+    return;
+  }
 
   try {
     console.log("Preparing data for submission");
@@ -173,7 +323,9 @@ incidentForm.addEventListener("submit", async (e) => {
     // Prepare the data
     const incidentData = {
       storeNumber: storeNumberInput.value.trim(),
-      incidentTypes: selectedIncidentTypes,
+      incidentTypes: Array.from(checkboxes)
+        .filter((checkbox) => checkbox.checked)
+        .map((checkbox) => checkbox.value),
       details: detailsInput.value.trim(),
       status: "pending",
       timestamp: serverTimestamp(),
@@ -182,10 +334,7 @@ incidentForm.addEventListener("submit", async (e) => {
     console.log("Data to be submitted:", incidentData);
 
     // Add to Firebase
-    const docRef = await addDoc(
-      collection(db, "incident-reports"),
-      incidentData
-    );
+    const docRef = await addDoc(collection(db, "incident-reports"), incidentData);
     console.log("Document written with ID: ", docRef.id);
 
     // Show success notification
@@ -195,10 +344,9 @@ incidentForm.addEventListener("submit", async (e) => {
     const storeNumber = storeNumberInput.value;
     incidentForm.reset();
     storeNumberInput.value = storeNumber;
+
     // Clear any existing error messages
-    document
-      .querySelectorAll(".error-message")
-      .forEach((error) => error.remove());
+    document.querySelectorAll(".error-message").forEach(error => error.remove());
   } catch (error) {
     console.error("Error submitting report:", error);
     showNotification("Error submitting report. Please try again.", 5000);
