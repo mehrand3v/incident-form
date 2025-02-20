@@ -167,6 +167,17 @@
 .modal-content::-webkit-scrollbar-thumb:hover {
     background: #e81cff;
 }
+@media (max-width: 480px) {
+    .modal-content {
+        margin: 15px auto;
+        padding: 15px;
+    }
+
+    .modal-content h2 {
+        font-size: 18px;
+        margin-bottom: 15px;
+    }
+}
 
         .button {
             position: relative;
@@ -665,12 +676,26 @@ tr {
     z-index: 1000;
 }
         @media (max-width: 768px) {
-            .modal-content {
+            /* .modal-content {
                 margin: 10% auto;
                 width: 95%;
                 padding: 15px;
-            }
+            } */
+ .modal {
+        padding: 10px;
+    }
 
+    .modal-content {
+        margin: 20px auto;
+        padding: 20px;
+        width: 90%;
+        max-height: 80vh;
+    }
+
+    .close-modal {
+        right: 10px;
+        top: 10px;
+    }
             .filters {
                 flex-direction: column;
                 gap: 10px;
