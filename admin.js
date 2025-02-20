@@ -7,6 +7,7 @@ import {
   onSnapshot,
   doc,
   updateDoc,
+  deleteDoc,
 } from "https://www.gstatic.com/firebasejs/11.3.1/firebase-firestore.js";
 
 // Your Firebase configuration
@@ -14,7 +15,7 @@ const firebaseConfig = {
   apiKey: "AIzaSyCXQZFYZfq4um2FiGn8EVzzBbzu64S6TqA",
   authDomain: "signin-azeem.firebaseapp.com",
   projectId: "signin-azeem",
-  storageBucket: "signin-azeem.firebasestorage.app",
+  storageBucket: "signin-azeem.firebaseapp.com",
   messagingSenderId: "761268740990",
   appId: "1:761268740990:web:45df375c4fd2332133492f",
   measurementId: "G-23PRYF0YR6",
@@ -59,6 +60,9 @@ const incidentTypeFilter = document.getElementById("incidentTypeFilter");
 const modal = document.getElementById("detailsModal");
 const modalContent = document.getElementById("modalContent");
 const closeModal = document.querySelector(".close-modal");
+const confirmModal = document.getElementById("confirmModal");
+const confirmYesBtn = document.getElementById("confirmYes");
+const confirmNoBtn = document.getElementById("confirmNo");
 let currentPage = 1;
 const itemsPerPage = 10;
 let allIncidents = [];
@@ -67,6 +71,9 @@ closeModal.onclick = () => (modal.style.display = "none");
 window.onclick = (event) => {
   if (event.target === modal) {
     modal.style.display = "none";
+  }
+  if (event.target === confirmModal) {
+    confirmModal.style.display = "none";
   }
 };
 
@@ -77,7 +84,6 @@ const formatDate = (timestamp) => {
   return date.toLocaleDateString() + " " + date.toLocaleTimeString();
 };
 
-// Create incident type spans
 // Create incident type spans
 const createIncidentTypeBadges = (types) => {
   if (!Array.isArray(types)) {
@@ -139,11 +145,11 @@ const displayCurrentPage = () => {
 
   const filteredIncidents = filterIncidents(allIncidents);
   const totalPages = Math.ceil(filteredIncidents.length / itemsPerPage);
- // Update record count display
-    const recordCountElement = document.getElementById("recordCount");
-    if (recordCountElement) {
-        recordCountElement.textContent = filteredIncidents.length;
-    }
+  // Update record count display
+  const recordCountElement = document.getElementById("recordCount");
+  if (recordCountElement) {
+    recordCountElement.textContent = filteredIncidents.length;
+  }
   document.getElementById("currentPage").textContent = currentPage;
   document.getElementById("totalPages").textContent = totalPages;
   document.getElementById("prevPage").disabled = currentPage === 1;
@@ -179,6 +185,11 @@ const displayCurrentPage = () => {
                         : "Mark Pending"
                     }
                 </button>
+                <button onclick="window.confirmDelete('${
+                  doc.id
+                }')" class="delete-button">
+                    Delete
+                </button>
             </td>
         `;
 
@@ -197,7 +208,6 @@ const filterIncidents = (incidents) => {
     const date = data.timestamp.toDate();
     let show = true;
 
-    // Date filter
     // Date filter
     if (dateValue !== "all") {
       const today = new Date();
@@ -262,6 +272,79 @@ window.updateStatus = async (docId, newStatus) => {
     console.error("Error updating status:", error);
     alert("Error updating status. Please try again.");
   }
+};
+
+// Confirm delete operation
+window.confirmDelete = (docId) => {
+  confirmModal.style.display = "block";
+
+  // Update the yes button's onclick to handle this specific document ID
+  confirmYesBtn.onclick = () => {
+    deleteIncident(docId);
+    confirmModal.style.display = "none";
+  };
+
+  confirmNoBtn.onclick = () => {
+    confirmModal.style.display = "none";
+  };
+};
+
+// Delete incident record
+const deleteIncident = async (docId) => {
+  try {
+    // Show loading indication
+    tableContainer.classList.add("loading");
+
+    // Delete the document from Firestore
+    await deleteDoc(doc(db, "incident-reports", docId));
+
+    // Remove loading indication after successful deletion
+    tableContainer.classList.remove("loading");
+
+    // Show success notification
+    showNotification("Record deleted successfully", "success");
+  } catch (error) {
+    console.error("Error deleting incident:", error);
+    tableContainer.classList.remove("loading");
+    showNotification("Error deleting record. Please try again.", "error");
+  }
+};
+
+// Create and show notification
+const showNotification = (message, type = "info") => {
+  const notification = document.createElement("div");
+  notification.className = `notification ${type}`;
+  notification.innerHTML = `
+    <div class="notification-content">
+      ${message}
+    </div>
+    <button class="notification-close">&times;</button>
+  `;
+
+  document.body.appendChild(notification);
+
+  // Show notification with animation
+  setTimeout(() => {
+    notification.classList.add("show");
+  }, 10);
+
+  // Auto close after 3 seconds
+  setTimeout(() => {
+    closeNotification(notification);
+  }, 3000);
+
+  // Close button handler
+  notification.querySelector(".notification-close").onclick = () => {
+    closeNotification(notification);
+  };
+};
+
+// Close notification with animation
+const closeNotification = (notification) => {
+  notification.classList.remove("show");
+  setTimeout(() => {
+    notification.remove();
+  }, 300);
 };
 
 // Filter handlers
@@ -397,88 +480,94 @@ const setupSelectObservers = () => {
 };
 // PDF Report Generation
 const setupPdfGeneration = () => {
-    const pdfButton = document.getElementById('generatePdfBtn');
-    if (!pdfButton) return;
+  const pdfButton = document.getElementById("generatePdfBtn");
+  if (!pdfButton) return;
 
-    pdfButton.addEventListener('click', generatePdfReport);
-}
+  pdfButton.addEventListener("click", generatePdfReport);
+};
 
 const generatePdfReport = () => {
-    // Apply current filters to get the data we want in the report
-    const filteredData = filterIncidents(allIncidents);
+  // Apply current filters to get the data we want in the report
+  const filteredData = filterIncidents(allIncidents);
 
-    // Get current filter values for the report header
-    const dateFilterText = dateFilter.options[dateFilter.selectedIndex].text;
-    const statusFilterText = statusFilter.options[statusFilter.selectedIndex].text;
-    const typeFilterText = incidentTypeFilter.options[incidentTypeFilter.selectedIndex].text;
-    const storeFilterText = storeFilter.value || "All Stores";
+  // Get current filter values for the report header
+  const dateFilterText = dateFilter.options[dateFilter.selectedIndex].text;
+  const statusFilterText =
+    statusFilter.options[statusFilter.selectedIndex].text;
+  const typeFilterText =
+    incidentTypeFilter.options[incidentTypeFilter.selectedIndex].text;
+  const storeFilterText = storeFilter.value || "All Stores";
 
-    // Create PDF document
-    const { jsPDF } = window.jspdf;
-    const doc = new jsPDF();
+  // Create PDF document
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF();
 
-    // Add title
-    doc.setFontSize(18);
-    doc.setTextColor(128, 0, 128); // Purple color to match your theme
-    doc.text("Incident Reports Dashboard", 14, 20);
+  // Add title
+  doc.setFontSize(18);
+  doc.setTextColor(128, 0, 128); // Purple color to match your theme
+  doc.text("Incident Reports Dashboard", 14, 20);
 
-    // Add filter information
-doc.setFontSize(10);
-doc.setTextColor(100, 100, 100);
-doc.text(`Generated on: ${new Date().toLocaleString()}`, 14, 30);
-doc.text(
-  `Filters: ${dateFilterText} | ${statusFilterText} | ${typeFilterText} | Store: ${storeFilterText}`,
-  14,
-  35
-);
-doc.text(`Total Records: ${filteredData.length}`, 14, 40);
+  // Add filter information
+  doc.setFontSize(10);
+  doc.setTextColor(100, 100, 100);
+  doc.text(`Generated on: ${new Date().toLocaleString()}`, 14, 30);
+  doc.text(
+    `Filters: ${dateFilterText} | ${statusFilterText} | ${typeFilterText} | Store: ${storeFilterText}`,
+    14,
+    35
+  );
+  doc.text(`Total Records: ${filteredData.length}`, 14, 40);
 
-    // Convert data for the table
-    const tableData = filteredData.map((doc) => {
-      const data = doc.data();
-      return [
-        formatDate(data.timestamp),
-        data.storeNumber,
-        Array.isArray(data.incidentTypes) ? data.incidentTypes.join(", ") : "",
-        data.details,
-        data.status,
-      ];
-    });
+  // Convert data for the table
+  const tableData = filteredData.map((doc) => {
+    const data = doc.data();
+    return [
+      formatDate(data.timestamp),
+      data.storeNumber,
+      Array.isArray(data.incidentTypes) ? data.incidentTypes.join(", ") : "",
+      data.details,
+      data.status,
+    ];
+  });
 
-    // Generate table
-    doc.autoTable({
-        head: [['Date', 'Store', 'Incident Types', 'Details', 'Status']],
-        body: tableData,
-        startY: 45,
-        styles: {
-            fontSize: 8,
-            cellPadding: 3,
-        },
-        columnStyles: {
-            0: { cellWidth: 30 }, // Date
-            1: { cellWidth: 15 }, // Store
-            2: { cellWidth: 30 }, // Incident Types
-            3: { cellWidth: 80 }, // Details
-            4: { cellWidth: 20 }  // Status
-        },
-        headStyles: {
-            fillColor: [232, 28, 255], // Your purple theme color
-            textColor: [255, 255, 255]
-        },
-        alternateRowStyles: {
-            fillColor: [245, 245, 245]
-        },
-        rowPageBreak: 'avoid',
-        didDrawPage: function(data) {
-            // Add page number
-            doc.setFontSize(8);
-            doc.text(`Page ${doc.internal.getNumberOfPages()}`, data.settings.margin.left, doc.internal.pageSize.height - 10);
-        }
-    });
+  // Generate table
+  doc.autoTable({
+    head: [["Date", "Store", "Incident Types", "Details", "Status"]],
+    body: tableData,
+    startY: 45,
+    styles: {
+      fontSize: 8,
+      cellPadding: 3,
+    },
+    columnStyles: {
+      0: { cellWidth: 30 }, // Date
+      1: { cellWidth: 15 }, // Store
+      2: { cellWidth: 30 }, // Incident Types
+      3: { cellWidth: 80 }, // Details
+      4: { cellWidth: 20 }, // Status
+    },
+    headStyles: {
+      fillColor: [232, 28, 255], // Your purple theme color
+      textColor: [255, 255, 255],
+    },
+    alternateRowStyles: {
+      fillColor: [245, 245, 245],
+    },
+    rowPageBreak: "avoid",
+    didDrawPage: function (data) {
+      // Add page number
+      doc.setFontSize(8);
+      doc.text(
+        `Page ${doc.internal.getNumberOfPages()}`,
+        data.settings.margin.left,
+        doc.internal.pageSize.height - 10
+      );
+    },
+  });
 
-    // Save the PDF
-    doc.save(`incident-report-${new Date().toISOString().slice(0,10)}.pdf`);
-}
+  // Save the PDF
+  doc.save(`incident-report-${new Date().toISOString().slice(0, 10)}.pdf`);
+};
 // Initialize the dashboard and custom selects when DOM is loaded
 document.addEventListener("DOMContentLoaded", () => {
   setupSelectObservers();
