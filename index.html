@@ -221,6 +221,121 @@
                 align-items: center;
             }
         }
+        /* see if below styles work */
+        /* Common mobile styles */
+@media screen and (max-width: 480px) {
+  /* Form container adjustments */
+  .form-container {
+    width: 90% !important;
+    max-width: none !important;
+    padding: 20px 16px !important;
+    margin: 10px !important;
+    gap: 16px !important;
+  }
+
+  /* Title adjustments */
+  .form-container h2,
+  .title {
+    font-size: 20px !important;
+    margin-bottom: 16px !important;
+  }
+
+  /* Form group spacing */
+  .form-group {
+    gap: 8px !important;
+    margin-top: 12px !important;
+  }
+
+  /* Checkbox container adjustments */
+  .checkbox-container {
+    grid-template-columns: 1fr !important;
+    gap: 12px !important;
+    padding: 4px !important;
+  }
+
+  /* Checkbox size adjustments */
+  .checkbox-flip {
+    width: 36px !important;
+    height: 36px !important;
+  }
+
+  /* Text size adjustments */
+  .checkbox-text {
+    font-size: 13px !important;
+  }
+
+  /* Input and textarea adjustments */
+  .form-group input[type="text"],
+  .form-group textarea {
+    padding: 8px 12px !important;
+    font-size: 13px !important;
+  }
+
+  /* Button adjustments */
+  .form-submit-btn,
+  .button {
+    width: 100% !important;
+    padding: 10px 16px !important;
+    font-size: 14px !important;
+  }
+
+  /* QR code page specific adjustments */
+  .container {
+    width: 90% !important;
+    max-width: none !important;
+    padding: 20px 16px !important;
+    margin: 10px !important;
+  }
+
+  .qr-container {
+    padding: 12px !important;
+  }
+
+  #qrCode img,
+  #qrCode canvas {
+    width: 200px !important;
+    height: 200px !important;
+  }
+
+  .instructions {
+    font-size: 13px !important;
+    margin: 12px 0 !important;
+  }
+
+  .navbar {
+    padding: 10px !important;
+    justify-content: center !important;
+  }
+
+  /* Print layout adjustments */
+  .print-layout .qr-container {
+    padding: 20px !important;
+  }
+
+  #printQrCode img,
+  #printQrCode canvas {
+    width: 300px !important;
+    height: 300px !important;
+  }
+
+  /* Body scroll fix */
+  html, body {
+    overflow-y: auto !important;
+    height: auto !important;
+  }
+
+  /* Admin button positioning */
+  body > div:first-of-type {
+    position: relative !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    display: flex !important;
+    justify-content: center !important;
+    padding: 10px !important;
+  }
+}
+        /* up to here */
     </style>
 </head>
 
