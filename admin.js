@@ -23,8 +23,8 @@ const firebaseConfig = {
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
-const tableContainer = document.querySelector('.table-container');
-const loader = document.createElement('div');
+const tableContainer = document.querySelector(".table-container");
+const loader = document.createElement("div");
 loader.innerHTML = `
     <div style="
         display: flex;
@@ -79,10 +79,14 @@ const formatDate = (timestamp) => {
 
 // Create incident type spans
 const createIncidentTypeBadges = (types) => {
+  if (!Array.isArray(types)) {
+    console.error("Invalid incident types:", types);
+    return "";
+  }
   return types
     .map((type) => {
-      // Keep the type exactly as it is in the database
-      return `<span class="incident-type" data-type="${type}">${type}</span>`;
+      // Keep the type exactly as it is in the database for data-type attribute
+      return `<span class="incident-type" data-type="${type.toLowerCase()}">${type}</span>`;
     })
     .join("");
 };
@@ -92,13 +96,19 @@ const populateIncidentTypeFilter = (incidents) => {
   const types = new Set();
   incidents.forEach((doc) => {
     const data = doc.data();
-    data.incidentTypes.forEach((type) => types.add(type));
+    if (Array.isArray(data.incidentTypes)) {
+      data.incidentTypes.forEach((type) => {
+        if (type) {
+          types.add(type.trim());
+        }
+      });
+    }
   });
 
   incidentTypeFilter.innerHTML = '<option value="all">All Types</option>';
   [...types].sort().forEach((type) => {
     const option = document.createElement("option");
-    option.value = type;
+    option.value = type.toLowerCase();
     option.textContent = type;
     incidentTypeFilter.appendChild(option);
   });
@@ -120,79 +130,111 @@ const loadIncidents = () => {
     displayCurrentPage();
   });
 };
+
 const displayCurrentPage = () => {
-    const tbody = incidentsTable.querySelector("tbody");
-    tbody.innerHTML = "";
+  const tbody = incidentsTable.querySelector("tbody");
+  tbody.innerHTML = "";
 
-    const filteredIncidents = filterIncidents(allIncidents);
-    const totalPages = Math.ceil(filteredIncidents.length / itemsPerPage);
+  const filteredIncidents = filterIncidents(allIncidents);
+  const totalPages = Math.ceil(filteredIncidents.length / itemsPerPage);
 
-    document.getElementById('currentPage').textContent = currentPage;
-    document.getElementById('totalPages').textContent = totalPages;
-    document.getElementById('prevPage').disabled = currentPage === 1;
-    document.getElementById('nextPage').disabled = currentPage === totalPages;
+  document.getElementById("currentPage").textContent = currentPage;
+  document.getElementById("totalPages").textContent = totalPages;
+  document.getElementById("prevPage").disabled = currentPage === 1;
+  document.getElementById("nextPage").disabled = currentPage === totalPages;
 
-    const start = (currentPage - 1) * itemsPerPage;
-    const paginatedIncidents = filteredIncidents.slice(start, start + itemsPerPage);
+  const start = (currentPage - 1) * itemsPerPage;
+  const paginatedIncidents = filteredIncidents.slice(
+    start,
+    start + itemsPerPage
+  );
 
-    paginatedIncidents.forEach((doc) => {
-        const data = doc.data();
-        const tr = document.createElement("tr");
+  paginatedIncidents.forEach((doc) => {
+    const data = doc.data();
+    const tr = document.createElement("tr");
 
-        tr.innerHTML = `
+    tr.innerHTML = `
             <td>${formatDate(data.timestamp)}</td>
             <td>${data.storeNumber}</td>
-            <td class="incident-types">${createIncidentTypeBadges(data.incidentTypes)}</td>
-            <td class="details-cell" onclick="window.showDetails('${encodeURIComponent(data.details)}')">${data.details}</td>
+            <td class="incident-types">${createIncidentTypeBadges(
+              data.incidentTypes
+            )}</td>
+            <td class="details-cell" onclick="window.showDetails('${encodeURIComponent(
+              data.details
+            )}')">${data.details}</td>
             <td class="status-${data.status}">${data.status}</td>
             <td class="actions">
-                <button onclick="window.updateStatus('${doc.id}', '${data.status === "pending" ? "resolved" : "pending"}')" class="status-button">
-                    ${data.status === "pending" ? "Mark Resolved" : "Mark Pending"}
+                <button onclick="window.updateStatus('${doc.id}', '${
+      data.status === "pending" ? "resolved" : "pending"
+    }')" class="status-button">
+                    ${
+                      data.status === "pending"
+                        ? "Mark Resolved"
+                        : "Mark Pending"
+                    }
                 </button>
             </td>
         `;
 
-        tbody.appendChild(tr);
-    });
+    tbody.appendChild(tr);
+  });
 };
 
 const filterIncidents = (incidents) => {
-    const dateValue = dateFilter.value;
-    const statusValue = statusFilter.value;
-    const storeValue = storeFilter.value.toLowerCase();
-    const typeValue = incidentTypeFilter.value;
+  const dateValue = dateFilter.value;
+  const statusValue = statusFilter.value;
+  const storeValue = storeFilter.value.toLowerCase();
+  const typeValue = incidentTypeFilter.value.toLowerCase();
 
-    return incidents.filter((doc) => {
-        const data = doc.data();
-        const date = data.timestamp.toDate();
-        let show = true;
+  return incidents.filter((doc) => {
+    const data = doc.data();
+    const date = data.timestamp.toDate();
+    let show = true;
 
-        if (dateValue !== "all") {
-            const today = new Date();
-            if (dateValue === "today" && date.toDateString() !== today.toDateString()) {
-                show = false;
-            } else if (dateValue === "week" && date < new Date(today - 7 * 24 * 60 * 60 * 1000)) {
-                show = false;
-            } else if (dateValue === "month" && date < new Date(today - 30 * 24 * 60 * 60 * 1000)) {
-                show = false;
-            }
-        }
+    // Date filter
+    if (dateValue !== "all") {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
 
-        if (statusValue !== "all" && data.status !== statusValue) {
-            show = false;
-        }
+      switch (dateValue) {
+        case "today":
+          show = date.toDateString() === today.toDateString();
+          break;
+        case "week":
+          const weekAgo = new Date(today - 7 * 24 * 60 * 60 * 1000);
+          show = date >= weekAgo;
+          break;
+        case "month":
+          const monthAgo = new Date(today - 30 * 24 * 60 * 60 * 1000);
+          show = date >= monthAgo;
+          break;
+      }
+    }
 
-        if (storeValue && !data.storeNumber.toLowerCase().includes(storeValue)) {
-            show = false;
-        }
+    // Status filter
+    if (statusValue !== "all" && data.status !== statusValue) {
+      show = false;
+    }
 
-        if (typeValue !== "all" && !data.incidentTypes.includes(typeValue)) {
-            show = false;
-        }
+    // Store filter
+    if (
+      storeValue &&
+      !data.storeNumber.toString().toLowerCase().includes(storeValue)
+    ) {
+      show = false;
+    }
 
-        return show;
-    });
+    // Incident type filter
+    if (typeValue !== "all") {
+      show =
+        Array.isArray(data.incidentTypes) &&
+        data.incidentTypes.some((type) => type.toLowerCase() === typeValue);
+    }
+
+    return show;
+  });
 };
+
 // Show details modal
 window.showDetails = (details) => {
   modalContent.textContent = decodeURIComponent(details);
@@ -222,20 +264,20 @@ dateFilter.addEventListener("change", applyFilters);
 statusFilter.addEventListener("change", applyFilters);
 storeFilter.addEventListener("input", applyFilters);
 incidentTypeFilter.addEventListener("change", applyFilters);
-document.getElementById('prevPage').addEventListener('click', () => {
-    if (currentPage > 1) {
-        currentPage--;
-        displayCurrentPage();
-    }
+document.getElementById("prevPage").addEventListener("click", () => {
+  if (currentPage > 1) {
+    currentPage--;
+    displayCurrentPage();
+  }
 });
 
-document.getElementById('nextPage').addEventListener('click', () => {
-    const filteredIncidents = filterIncidents(allIncidents);
-    const totalPages = Math.ceil(filteredIncidents.length / itemsPerPage);
-    if (currentPage < totalPages) {
-        currentPage++;
-        displayCurrentPage();
-    }
+document.getElementById("nextPage").addEventListener("click", () => {
+  const filteredIncidents = filterIncidents(allIncidents);
+  const totalPages = Math.ceil(filteredIncidents.length / itemsPerPage);
+  if (currentPage < totalPages) {
+    currentPage++;
+    displayCurrentPage();
+  }
 });
 // Add logout functionality
 const logoutButton = document.createElement("button");
@@ -250,82 +292,101 @@ logoutButton.onclick = () => {
 // Add logout button to navbar
 document.querySelector(".navbar").appendChild(logoutButton);
 
-// Add logout button to navbar
-document.querySelector('.navbar').appendChild(logoutButton);
+// Custom select implementation
 function createCustomSelect(originalSelect) {
-    const wrapper = document.createElement('div');
-    wrapper.className = 'custom-select-wrapper';
+  const wrapper = document.createElement("div");
+  wrapper.className = "custom-select-wrapper";
 
-    const customSelect = document.createElement('div');
-    customSelect.className = 'custom-select';
+  const customSelect = document.createElement("div");
+  customSelect.className = "custom-select";
 
-    const trigger = document.createElement('div');
-    trigger.className = 'custom-select__trigger';
-    trigger.innerHTML = `<span>${originalSelect.options[originalSelect.selectedIndex].text}</span><div class="arrow"></div>`;
+  const trigger = document.createElement("div");
+  trigger.className = "custom-select__trigger";
+  trigger.innerHTML = `<span>${
+    originalSelect.options[originalSelect.selectedIndex].text
+  }</span><div class="arrow"></div>`;
 
-    const optionsList = document.createElement('div');
-    optionsList.className = 'custom-options';
+  const optionsList = document.createElement("div");
+  optionsList.className = "custom-options";
 
-    // Create custom options
-    Array.from(originalSelect.options).forEach(option => {
-        const customOption = document.createElement('span');
-        customOption.className = 'custom-option';
-        customOption.setAttribute('data-value', option.value);
-        customOption.textContent = option.text;
+  // Create custom options
+  Array.from(originalSelect.options).forEach((option) => {
+    const customOption = document.createElement("span");
+    customOption.className = "custom-option";
+    customOption.setAttribute("data-value", option.value);
+    customOption.textContent = option.text;
 
-        if (option.selected) {
-            customOption.classList.add('selected');
-        }
+    if (option.selected) {
+      customOption.classList.add("selected");
+    }
 
-        customOption.addEventListener('click', (e) => {
-            // Update original select
-            originalSelect.value = e.target.getAttribute('data-value');
+    customOption.addEventListener("click", (e) => {
+      // Update original select
+      originalSelect.value = e.target.getAttribute("data-value");
 
-            // Update custom select
-            trigger.querySelector('span').textContent = e.target.textContent;
-            optionsList.querySelector('.selected')?.classList.remove('selected');
-            e.target.classList.add('selected');
+      // Update custom select
+      trigger.querySelector("span").textContent = e.target.textContent;
+      optionsList.querySelector(".selected")?.classList.remove("selected");
+      e.target.classList.add("selected");
 
-            // Close dropdown
-            customSelect.classList.remove('open');
+      // Close dropdown
+      customSelect.classList.remove("open");
 
-            // Trigger change event on original select
-            const event = new Event('change');
-            originalSelect.dispatchEvent(event);
-        });
-
-        optionsList.appendChild(customOption);
+      // Trigger change event on original select
+      const event = new Event("change");
+      originalSelect.dispatchEvent(event);
     });
 
-    // Toggle dropdown
-    trigger.addEventListener('click', () => {
-        customSelect.classList.toggle('open');
-    });
+    optionsList.appendChild(customOption);
+  });
 
-    // Close dropdown when clicking outside
-    document.addEventListener('click', (e) => {
-        if (!wrapper.contains(e.target)) {
-            customSelect.classList.remove('open');
-        }
-    });
+  // Toggle dropdown
+  trigger.addEventListener("click", () => {
+    customSelect.classList.toggle("open");
+  });
 
-    customSelect.appendChild(trigger);
-    customSelect.appendChild(optionsList);
-    wrapper.appendChild(customSelect);
+  // Close dropdown when clicking outside
+  document.addEventListener("click", (e) => {
+    if (!wrapper.contains(e.target)) {
+      customSelect.classList.remove("open");
+    }
+  });
 
-    // Hide original select
-    originalSelect.style.display = 'none';
-    originalSelect.parentNode.insertBefore(wrapper, originalSelect);
+  customSelect.appendChild(trigger);
+  customSelect.appendChild(optionsList);
+  wrapper.appendChild(customSelect);
 
-    return wrapper;
+  // Hide original select
+  originalSelect.style.display = "none";
+  originalSelect.parentNode.insertBefore(wrapper, originalSelect);
+
+  return wrapper;
 }
 
-// Initialize custom selects
-document.addEventListener('DOMContentLoaded', () => {
-    const selects = document.querySelectorAll('select');
-    selects.forEach(select => {
-        createCustomSelect(select);
+// Observer to handle dynamically added options
+const setupSelectObservers = () => {
+  const selects = document.querySelectorAll("select");
+  selects.forEach((select) => {
+    // First create the custom select
+    const customSelectWrapper = createCustomSelect(select);
+
+    // Then observe changes to the original select
+    const observer = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        if (mutation.type === "childList") {
+          // Rebuild the custom select
+          customSelectWrapper.parentNode.removeChild(customSelectWrapper);
+          createCustomSelect(select);
+        }
+      });
     });
+
+    observer.observe(select, { childList: true });
+  });
+};
+
+// Initialize the dashboard and custom selects when DOM is loaded
+document.addEventListener("DOMContentLoaded", () => {
+  setupSelectObservers();
+  loadIncidents();
 });
-// Initialize the dashboard
-loadIncidents();
