@@ -377,6 +377,7 @@ tr {
     }
     .title {
             font-size: 20px; /* Adjust the font size for the title */
+            display:none;
         }
 
         .button span {
@@ -675,6 +676,10 @@ tr {
     transform: translate(-50%, -50%);
     z-index: 1000;
 }
+.button-group {
+    display: flex;
+    margin: -10px;
+}
         @media (max-width: 768px) {
             /* .modal-content {
                 margin: 10% auto;
@@ -742,21 +747,44 @@ tr {
     body{
         padding:10px;
     }
+     .button-group {
+        flex-direction: column;
+    }
         }
         .filter-group label[for="incidentTypeFilter"] {
     min-width: unset;
+}
+/* Vertical layout for incident types */
+.incident-types {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.incident-type {
+    display: inline-block;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 500;
+    width: fit-content;
 }
     </style>
 </head>
 
 <body>
     <div class="dashboard-container">
-        <div class="navbar">
-            <h1 class="title">Incident Reports Dashboard</h1>
+    <div class="navbar">
+        <h1 class="title">Incident Reports Dashboard</h1>
+        <div class="button-group">
+            <button id="generatePdfBtn" class="button">
+                <span>Generate PDF Report</span>
+            </button>
             <a href="signin.html" class="button">
                 <span>Back to Form</span>
             </a>
         </div>
+    </div>
 
         <div class="table-container">
             <div class="filters">
@@ -820,7 +848,8 @@ tr {
             <p id="modalContent"></p>
         </div>
     </div>
-
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
     <script type="module" src="admin.js"></script>
 </body>
 

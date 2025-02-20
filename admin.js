@@ -78,6 +78,7 @@ const formatDate = (timestamp) => {
 };
 
 // Create incident type spans
+// Create incident type spans
 const createIncidentTypeBadges = (types) => {
   if (!Array.isArray(types)) {
     console.error("Invalid incident types:", types);
@@ -86,7 +87,7 @@ const createIncidentTypeBadges = (types) => {
   return types
     .map((type) => {
       // Keep the type exactly as it is in the database for data-type attribute
-      return `<span class="incident-type" data-type="${type.toLowerCase()}">${type}</span>`;
+      return `<div class="incident-type" data-type="${type.toLowerCase()}">${type}</div>`;
     })
     .join("");
 };
@@ -98,7 +99,8 @@ const populateIncidentTypeFilter = (incidents) => {
     const data = doc.data();
     if (Array.isArray(data.incidentTypes)) {
       data.incidentTypes.forEach((type) => {
-        if (type) {
+        // Skip harassment type
+        if (type && type.toLowerCase() !== "harassment") {
           types.add(type.trim());
         }
       });
@@ -192,20 +194,25 @@ const filterIncidents = (incidents) => {
     let show = true;
 
     // Date filter
+    // Date filter
     if (dateValue !== "all") {
       const today = new Date();
       today.setHours(0, 0, 0, 0);
 
       switch (dateValue) {
         case "today":
-          show = date.toDateString() === today.toDateString();
+          const todayEnd = new Date(today);
+          todayEnd.setHours(23, 59, 59, 999);
+          show = date >= today && date <= todayEnd;
           break;
         case "week":
-          const weekAgo = new Date(today - 7 * 24 * 60 * 60 * 1000);
+          const weekAgo = new Date(today);
+          weekAgo.setDate(weekAgo.getDate() - 7);
           show = date >= weekAgo;
           break;
         case "month":
-          const monthAgo = new Date(today - 30 * 24 * 60 * 60 * 1000);
+          const monthAgo = new Date(today);
+          monthAgo.setDate(monthAgo.getDate() - 30);
           show = date >= monthAgo;
           break;
       }
@@ -384,9 +391,88 @@ const setupSelectObservers = () => {
     observer.observe(select, { childList: true });
   });
 };
+// PDF Report Generation
+const setupPdfGeneration = () => {
+    const pdfButton = document.getElementById('generatePdfBtn');
+    if (!pdfButton) return;
 
+    pdfButton.addEventListener('click', generatePdfReport);
+}
+
+const generatePdfReport = () => {
+    // Apply current filters to get the data we want in the report
+    const filteredData = filterIncidents(allIncidents);
+
+    // Get current filter values for the report header
+    const dateFilterText = dateFilter.options[dateFilter.selectedIndex].text;
+    const statusFilterText = statusFilter.options[statusFilter.selectedIndex].text;
+    const typeFilterText = incidentTypeFilter.options[incidentTypeFilter.selectedIndex].text;
+    const storeFilterText = storeFilter.value || "All Stores";
+
+    // Create PDF document
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+
+    // Add title
+    doc.setFontSize(18);
+    doc.setTextColor(128, 0, 128); // Purple color to match your theme
+    doc.text("Incident Reports Dashboard", 14, 20);
+
+    // Add filter information
+    doc.setFontSize(10);
+    doc.setTextColor(100, 100, 100);
+    doc.text(`Generated on: ${new Date().toLocaleString()}`, 14, 30);
+    doc.text(`Filters: ${dateFilterText} | ${statusFilterText} | ${typeFilterText} | Store: ${storeFilterText}`, 14, 35);
+
+    // Convert data for the table
+    const tableData = filteredData.map(doc => {
+        const data = doc.data();
+        return [
+            formatDate(data.timestamp),
+            data.storeNumber,
+            Array.isArray(data.incidentTypes) ? data.incidentTypes.join(", ") : "",
+            data.details,
+            data.status
+        ];
+    });
+
+    // Generate table
+    doc.autoTable({
+        head: [['Date', 'Store', 'Incident Types', 'Details', 'Status']],
+        body: tableData,
+        startY: 40,
+        styles: {
+            fontSize: 8,
+            cellPadding: 3,
+        },
+        columnStyles: {
+            0: { cellWidth: 30 }, // Date
+            1: { cellWidth: 15 }, // Store
+            2: { cellWidth: 30 }, // Incident Types
+            3: { cellWidth: 80 }, // Details
+            4: { cellWidth: 20 }  // Status
+        },
+        headStyles: {
+            fillColor: [232, 28, 255], // Your purple theme color
+            textColor: [255, 255, 255]
+        },
+        alternateRowStyles: {
+            fillColor: [245, 245, 245]
+        },
+        rowPageBreak: 'avoid',
+        didDrawPage: function(data) {
+            // Add page number
+            doc.setFontSize(8);
+            doc.text(`Page ${doc.internal.getNumberOfPages()}`, data.settings.margin.left, doc.internal.pageSize.height - 10);
+        }
+    });
+
+    // Save the PDF
+    doc.save(`incident-report-${new Date().toISOString().slice(0,10)}.pdf`);
+}
 // Initialize the dashboard and custom selects when DOM is loaded
 document.addEventListener("DOMContentLoaded", () => {
   setupSelectObservers();
   loadIncidents();
+  setupPdfGeneration();
 });
