@@ -18,6 +18,8 @@
         .dashboard-container {
             max-width: 1200px;
             margin: 0 auto;
+              width: 100%;
+    box-sizing: border-box;
         }
 
         .title {
@@ -94,17 +96,18 @@
             z-index: 1000;
         }
 
-        .modal-content {
-            position: relative;
-            background-color: #212121;
-            margin: 15% auto;
-            padding: 20px;
-            border: 1px solid #414141;
-            border-radius: 10px;
-            width: 80%;
-            max-width: 600px;
-        }
 
+.modal-content {
+    position: relative;
+    background-color: #212121;
+    margin: 5vh auto; /* Changed from 15% to 5vh for better mobile experience */
+    width: 90%; /* Changed from 80% */
+    max-width: 600px;
+    max-height: 90vh; /* Changed from 80vh */
+    overflow-y: auto;
+    padding: 20px;
+    border-radius: 10px;
+}
         .close-modal {
             position: absolute;
             right: 10px;
@@ -144,21 +147,36 @@
         .button:hover::before {
             opacity: 0.7;
         }
+.button:active {
+    transform: scale(0.98);
+}
 
-        .filters {
-            display: flex;
-            gap: 20px;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
-            position:relative;
-            z-index:10;
-        }
+.button:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(232, 28, 255, 0.3);
+}
+      .filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    margin-bottom: 20px;
+    padding: 0 12px;
+    box-sizing: border-box;
+}
 
-        .filter-group {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
+       .filter-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 200px;
+    flex: 1;
+    max-width: calc(50% - 10px); /* Allow 2 filters per row with gap */
+}
+
+.filter-group label {
+    white-space: nowrap;
+    min-width: 60px; /* Consistent label width */
+}
 .filter-group input,
 .filter-group select {
     width:100%;
@@ -211,18 +229,27 @@
         }
 
         /* Enhanced Filter Group Styles */
-        .filter-group {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
+      .filter-group {
+    gap: 8px;
+    margin-bottom: 12px;
+    width: 100%;
+}
 
-        .filter-group label {
-            font-weight: 500;
-            color: #e81cff;
-            min-width: 100px;
-        }
+.filter-group label {
+    font-size: 14px;
+    white-space: nowrap;
+}
+.table-container {
+    transition: opacity 0.3s ease;
+}
 
+tr {
+    transition: background-color 0.2s ease;
+}
+
+.incident-type {
+    transition: all 0.2s ease;
+}
         /* Responsive adjustments */
        @media (max-width: 768px) {
     select,
@@ -236,7 +263,25 @@
         align-items: flex-start; /* Align items to the start */
         width: 100%; /* Ensure filter groups take full width */
     }
+.filter-group input,
+.filter-group select,
+.custom-select-wrapper {
+    flex: 1;
+    min-width: 180px;
+    max-width: 300px;
+    width: 100%;
+}
 
+   .custom-select,
+.custom-select__trigger {
+    width: 100%;
+    box-sizing: border-box;
+}
+
+    .custom-options {
+        width: 100%;
+        box-sizing: border-box;
+    }
     .filter-group label {
         margin-bottom: 4px; /* Add some spacing between label and input */
     }
@@ -263,6 +308,10 @@
 
     .table-container {
         overflow-x: auto; /* Allow horizontal scrolling on small screens */
+         -webkit-overflow-scrolling: touch;
+         padding: 15px;
+        width: auto;
+        box-sizing: border-box;
     }
     .title {
             font-size: 20px; /* Adjust the font size for the title */
@@ -470,17 +519,16 @@
             margin-right: 8px;
         }
 
-        /* Shoplifting - Red theme */
-        .incident-type[data-type="shoplifting"] {
-            background-color: rgba(244, 67, 54, 0.2);
-            color: #f44336;
-        }
+      /* Updated incident type colors for better distinction */
+.incident-type[data-type="shoplifting"] {
+    background-color: rgba(244, 67, 54, 0.2);
+    color: #ff5252; /* Lighter red */
+}
 
-        /* Robbery - Dark red theme */
-        .incident-type[data-type="robbery"] {
-            background-color: rgba(198, 40, 40, 0.2);
-            color: #c62828;
-        }
+.incident-type[data-type="robbery"] {
+    background-color: rgba(136, 14, 79, 0.2);
+    color: #d33388; /* Darker magenta */
+}
 
         /* Beer-run - Orange theme */
         .incident-type[data-type="beer-run"] {
@@ -546,12 +594,25 @@
             background-color: #e81cff;
             border-color: #e81cff;
         }
-
+.modal-content h2{
+    color:#e81cff;
+}
         .pagination-info {
             color: #fff;
             margin: 0 15px;
         }
+.table-container.loading {
+    opacity: 0.7;
+    pointer-events: none;
+}
 
+.loader {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1000;
+}
         @media (max-width: 768px) {
             .modal-content {
                 margin: 10% auto;
@@ -562,16 +623,49 @@
             .filters {
                 flex-direction: column;
                 gap: 10px;
+                padding:0 8px;
             }
 
-            .filter-group {
-                width: 100%;
-            }
+             .filter-group {
+        max-width: 100%;
+        width: 100%;
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .filter-group label {
+        margin-bottom: 4px;
+    }
 
             select,
             input {
                 width: 100%;
             }
+             /* Minimum width for table cells */
+    table td, table th {
+        min-width: 120px;
+        white-space: nowrap;
+    }
+
+    /* Allow details cell to wrap */
+    .details-cell {
+        min-width: 200px;
+        white-space: normal;
+    }
+      .filter-group input,
+    .filter-group select,
+    .custom-select-wrapper {
+        width: calc(100% - 16px) !important; /* Account for padding */
+        min-width: calc(100% - 16px) !important;
+        max-width: calc(100% - 16px) !important;
+        box-sizing: border-box;
+          /* width: 100%;
+        max-width: 100%;
+        min-width: 100%; */
+    }
+    body{
+        padding:10px;
+    }
         }
     </style>
 </head>
