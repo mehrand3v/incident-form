@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Login</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
     <style>
+        /* Previous styles remain the same */
         body {
             font-family: 'Inter', sans-serif;
             background: #212121;
@@ -73,13 +75,18 @@
         }
     </style>
 </head>
+
 <body>
     <div class="login-container">
         <h2>Admin Login</h2>
         <form id="loginForm">
             <div class="form-group">
+                <label for="username">Username</label>
+                <input type="text" id="username">
+            </div>
+            <div class="form-group">
                 <label for="password">Password</label>
-                <input type="password" id="password" required>
+                <input type="password" id="password">
             </div>
             <div class="error" id="errorMessage"></div>
             <button type="submit">Login</button>
@@ -90,27 +97,48 @@
         const loginForm = document.getElementById('loginForm');
         const errorMessage = document.getElementById('errorMessage');
 
-        // Hardcoded password
-        const ADMIN_PASSWORD = "Letmein!1";
+        // Updated credentials with permission levels
+        const VALID_CREDENTIALS = {
+            'Admin': {
+                password: 'Letmein!1',
+                accessLevel: 'limited',
+                redirectPage: 'admin-view.html'  // Suggested name for limited access version
+            },
+            'Don': {
+                password: 'Don123',
+                accessLevel: 'full',
+                redirectPage: 'admin.html'  // Full access version
+            }
+        };
 
         loginForm.addEventListener('submit', (e) => {
             e.preventDefault();
+            const username = document.getElementById('username').value;
             const password = document.getElementById('password').value;
 
-            if (password === ADMIN_PASSWORD) {
-                // Store authentication in session
+            const userCredentials = VALID_CREDENTIALS[username];
+
+            if (userCredentials && userCredentials.password === password) {
+                // Store authentication, username, and access level in session
                 sessionStorage.setItem('adminAuthenticated', 'true');
-                // Redirect to admin dashboard
-                window.location.href = 'admin.html';
+                sessionStorage.setItem('username', username);
+                sessionStorage.setItem('accessLevel', userCredentials.accessLevel);
+
+                // Redirect to appropriate dashboard based on access level
+                window.location.href = userCredentials.redirectPage;
             } else {
-                errorMessage.textContent = 'Invalid password';
+                errorMessage.textContent = 'Invalid username or password';
             }
         });
 
-        // Check if already authenticated
+        // Check if already authenticated and redirect to appropriate page
         if (sessionStorage.getItem('adminAuthenticated') === 'true') {
-            window.location.href = 'admin.html';
+            const username = sessionStorage.getItem('username');
+            if (username && VALID_CREDENTIALS[username]) {
+                window.location.href = VALID_CREDENTIALS[username].redirectPage;
+            }
         }
     </script>
 </body>
+
 </html>
