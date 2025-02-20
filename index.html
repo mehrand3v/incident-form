@@ -9,10 +9,12 @@
     <!-- QR Code library -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <style>
-        html,body{
+        html,
+        body {
             height: 100%;
             overflow: hidden;
         }
+
         body {
             font-family: 'Inter', sans-serif;
             background: #212121;
@@ -151,6 +153,73 @@
         #qrCode {
             margin: 0 auto;
         }
+
+        /* New styles for print button and print layout */
+        .print-btn {
+            background: none;
+            /* border: 1px solid #40c9ff;
+            color: #40c9ff; */
+             border: 1px solid #e81cff;
+            color: #e81cff;
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-top: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .print-btn:hover {
+            /* background: #40c9ff;
+            color: white; */
+            background: #e81cff;
+            color: white;
+        }
+
+        .print-layout {
+            display: none;
+            text-align: center;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .print-layout .qr-container {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            /* border: 4px solid #40c9ff; */
+            border: 4px solid #e81cff;
+            display: inline-block;
+            margin: 20px auto;
+        }
+
+        .print-layout .title {
+            font-size: 36px;
+            margin-bottom: 40px;
+        }
+
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+
+            .print-layout,
+            .print-layout * {
+                visibility: visible;
+            }
+
+            .print-layout {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+                height: 100%;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+            }
+        }
     </style>
 </head>
 
@@ -171,6 +240,15 @@
             Place this QR code in accessible locations around the store.
         </p>
         <button class="download-btn" onclick="downloadQR()">Download QR Code</button>
+        <button class="print-btn" onclick="printQR()">Print QR Code</button>
+    </div>
+
+    <!-- Print layout -->
+    <div class="print-layout">
+        <h1 class="title">Incident Report QR Code</h1>
+        <div class="qr-container">
+            <div id="printQrCode"></div>
+        </div>
     </div>
 
     <script>
@@ -191,6 +269,16 @@
             correctLevel: QRCode.CorrectLevel.H
         });
 
+        // Create QR Code for print
+        const printQr = new QRCode(document.getElementById("printQrCode"), {
+            text: getBasePath(),
+            width: 400,
+            height: 400,
+            colorDark: "#000000",
+            colorLight: "#ffffff",
+            correctLevel: QRCode.CorrectLevel.H
+        });
+
         // Function to download QR code
         function downloadQR() {
             const canvas = document.querySelector("#qrCode canvas");
@@ -198,6 +286,11 @@
             link.download = "incident-report-qr.png";
             link.href = canvas.toDataURL("image/png");
             link.click();
+        }
+
+        // Function to print QR code
+        function printQR() {
+            window.print();
         }
     </script>
 </body>
