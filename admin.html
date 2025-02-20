@@ -740,9 +740,6 @@ tr {
         min-width: calc(100% - 16px) !important;
         max-width: calc(100% - 16px) !important;
         box-sizing: border-box;
-          /* width: 100%;
-        max-width: 100%;
-        min-width: 100%; */
     }
     body{
         padding:10px;
@@ -768,6 +765,26 @@ tr {
     font-size: 12px;
     font-weight: 500;
     width: fit-content;
+}
+.records-counter {
+    margin: 15px 0;
+    font-size: 14px;
+    color: #e81cff;
+    font-weight: 500;
+    padding-left: 12px;
+    display: flex;
+    justify-content: start;
+    align-items: center;
+}
+
+.records-counter span {
+    color: white;
+    background-color: rgba(232, 28, 255, 0.2);
+    padding: 2px 8px;
+    border-radius: 4px;
+    margin: 0 4px;
+    font-size:16px;
+    letter-spacing: 1.6px;
 }
     </style>
 </head>
@@ -816,7 +833,8 @@ tr {
                     <input type="text" id="storeFilter" placeholder="Store number...">
                 </div>
             </div>
-
+ <div class="records-counter">Showing <span id="recordCount">0</span> incident reports
+    </div>
             <table id="incidentsTable">
                 <thead>
                     <tr>

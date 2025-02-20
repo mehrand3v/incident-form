@@ -139,7 +139,11 @@ const displayCurrentPage = () => {
 
   const filteredIncidents = filterIncidents(allIncidents);
   const totalPages = Math.ceil(filteredIncidents.length / itemsPerPage);
-
+ // Update record count display
+    const recordCountElement = document.getElementById("recordCount");
+    if (recordCountElement) {
+        recordCountElement.textContent = filteredIncidents.length;
+    }
   document.getElementById("currentPage").textContent = currentPage;
   document.getElementById("totalPages").textContent = totalPages;
   document.getElementById("prevPage").disabled = currentPage === 1;
@@ -419,28 +423,33 @@ const generatePdfReport = () => {
     doc.text("Incident Reports Dashboard", 14, 20);
 
     // Add filter information
-    doc.setFontSize(10);
-    doc.setTextColor(100, 100, 100);
-    doc.text(`Generated on: ${new Date().toLocaleString()}`, 14, 30);
-    doc.text(`Filters: ${dateFilterText} | ${statusFilterText} | ${typeFilterText} | Store: ${storeFilterText}`, 14, 35);
+doc.setFontSize(10);
+doc.setTextColor(100, 100, 100);
+doc.text(`Generated on: ${new Date().toLocaleString()}`, 14, 30);
+doc.text(
+  `Filters: ${dateFilterText} | ${statusFilterText} | ${typeFilterText} | Store: ${storeFilterText}`,
+  14,
+  35
+);
+doc.text(`Total Records: ${filteredData.length}`, 14, 40);
 
     // Convert data for the table
-    const tableData = filteredData.map(doc => {
-        const data = doc.data();
-        return [
-            formatDate(data.timestamp),
-            data.storeNumber,
-            Array.isArray(data.incidentTypes) ? data.incidentTypes.join(", ") : "",
-            data.details,
-            data.status
-        ];
+    const tableData = filteredData.map((doc) => {
+      const data = doc.data();
+      return [
+        formatDate(data.timestamp),
+        data.storeNumber,
+        Array.isArray(data.incidentTypes) ? data.incidentTypes.join(", ") : "",
+        data.details,
+        data.status,
+      ];
     });
 
     // Generate table
     doc.autoTable({
         head: [['Date', 'Store', 'Incident Types', 'Details', 'Status']],
         body: tableData,
-        startY: 40,
+        startY: 45,
         styles: {
             fontSize: 8,
             cellPadding: 3,
