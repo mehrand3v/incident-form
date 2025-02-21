@@ -83,14 +83,28 @@ const detailsInput = document.getElementById("details");
 const checkboxes = document.querySelectorAll('input[name="incidentType"]');
 const submitButton = document.querySelector(".form-submit-btn");
 // Add event listeners for live validation of checkboxes
-checkboxes.forEach(checkbox => {
-  checkbox.addEventListener('change', () => {
+checkboxes.forEach((checkbox) => {
+  checkbox.addEventListener("change", (event) => {
     const container = document.querySelector(".checkbox-container");
-    if (Array.from(checkboxes).some(cb => cb.checked)) {
-      // If any checkbox is checked, clear the error
+
+    if (event.target.checked) {
+      // Uncheck all other checkboxes
+      checkboxes.forEach((cb) => {
+        if (cb !== event.target) {
+          cb.checked = false;
+        }
+      });
+
+      // Clear any existing error messages
       const errorDiv = container.nextElementSibling;
       if (errorDiv && errorDiv.classList.contains("error-message")) {
         errorDiv.remove();
+      }
+    } else {
+      // If unchecking the only checked box, show validation message
+      const anyChecked = Array.from(checkboxes).some((cb) => cb.checked);
+      if (!anyChecked) {
+        showError(container, "Please select one incident type");
       }
     }
   });
@@ -127,7 +141,19 @@ storeNumberInput.addEventListener("input", (e) => {
   }
 });
 const validateIncidentTypes = () => {
-  return Array.from(checkboxes).some((checkbox) => checkbox.checked);
+  const checkedCount = Array.from(checkboxes).filter(
+    (checkbox) => checkbox.checked
+  ).length;
+  const container = document.querySelector(".checkbox-container");
+
+  if (checkedCount === 0) {
+    showError(container, "Please select one incident type");
+    return false;
+  } else if (checkedCount > 1) {
+    showError(container, "Please select only one incident type per report");
+    return false;
+  }
+  return true;
 };
 // Add this function after your other validation functions
 
