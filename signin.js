@@ -81,7 +81,20 @@ const incidentForm = document.getElementById("incidentForm");
 const storeNumberInput = document.getElementById("storeNumber");
 const detailsInput = document.getElementById("details");
 const checkboxes = document.querySelectorAll('input[name="incidentType"]');
-
+const submitButton = document.querySelector(".form-submit-btn");
+// Add event listeners for live validation of checkboxes
+checkboxes.forEach(checkbox => {
+  checkbox.addEventListener('change', () => {
+    const container = document.querySelector(".checkbox-container");
+    if (Array.from(checkboxes).some(cb => cb.checked)) {
+      // If any checkbox is checked, clear the error
+      const errorDiv = container.nextElementSibling;
+      if (errorDiv && errorDiv.classList.contains("error-message")) {
+        errorDiv.remove();
+      }
+    }
+  });
+});
 // Set initial store number value and position cursor at the end
 storeNumberInput.addEventListener("focus", function () {
   const len = this.value.length;
@@ -90,23 +103,27 @@ storeNumberInput.addEventListener("focus", function () {
 
 // Form validation functions
 const validateStoreNumber = (value) => {
-  const storeNumberRegex = /^\d{7}$/; // Must be exactly 7 digits
+  const storeNumberRegex = /^\d{7}$/;
   return storeNumberRegex.test(value.trim());
 };
+
 // Real-time validation for store number
 storeNumberInput.addEventListener("input", (e) => {
   // Only allow digits
-  e.target.value = e.target.value.replace(/\D/g, '');
+  e.target.value = e.target.value.replace(/\D/g, "");
 
   // Limit to 7 digits
   if (e.target.value.length > 7) {
     e.target.value = e.target.value.slice(0, 7);
   }
 
-  if (!validateStoreNumber(storeNumberInput.value)) {
-    showError(storeNumberInput, "Please enter a 7-digit store number");
+  // Validate length as user types
+  if (e.target.value.length === 0) {
+    clearError(e.target);
+  } else if (e.target.value.length < 7) {
+    showError(e.target, "Please enter a 7-digit store number");
   } else {
-    clearError(storeNumberInput);
+    clearError(e.target);
   }
 });
 const validateIncidentTypes = () => {
@@ -334,19 +351,29 @@ incidentForm.addEventListener("submit", async (e) => {
     console.log("Data to be submitted:", incidentData);
 
     // Add to Firebase
-    const docRef = await addDoc(collection(db, "incident-reports"), incidentData);
+    const docRef = await addDoc(
+      collection(db, "incident-reports"),
+      incidentData
+    );
     console.log("Document written with ID: ", docRef.id);
 
     // Show success notification
     showNotification("Incident report submitted successfully");
 
-    // Reset form while preserving store number
+    // Save store number before resetting form
     const storeNumber = storeNumberInput.value;
-    incidentForm.reset();
+
+    // Reset specific fields
+    checkboxes.forEach((checkbox) => (checkbox.checked = false));
+    detailsInput.value = "";
+
+    // Restore store number
     storeNumberInput.value = storeNumber;
 
     // Clear any existing error messages
-    document.querySelectorAll(".error-message").forEach(error => error.remove());
+    document
+      .querySelectorAll(".error-message")
+      .forEach((error) => error.remove());
   } catch (error) {
     console.error("Error submitting report:", error);
     showNotification("Error submitting report. Please try again.", 5000);
