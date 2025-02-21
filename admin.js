@@ -541,9 +541,9 @@ const generatePdfReport = () => {
     },
     columnStyles: {
       0: { cellWidth: 30 }, // Date
-      1: { cellWidth: 15 }, // Store
+      1: { cellWidth: 20, overflow: "linebreak" }, // Store
       2: { cellWidth: 30 }, // Incident Types
-      3: { cellWidth: 80 }, // Details
+      3: { cellWidth: 75 }, // Details
       4: { cellWidth: 20 }, // Status
     },
     headStyles: {
