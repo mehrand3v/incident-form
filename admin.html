@@ -877,6 +877,24 @@ tr {
 .status-button:hover {
     background-color: rgba(64, 201, 255, 0.4);
 }
+@keyframes subtle-glow {
+    0% {
+        text-shadow: 0 0 4px rgba(232, 28, 255, 0.5), 0 0 8px rgba(232, 28, 255, 0.3);
+    }
+    50% {
+        text-shadow: 0 0 8px rgba(232, 28, 255, 0.7), 0 0 14px rgba(232, 28, 255, 0.5);
+    }
+    100% {
+        text-shadow: 0 0 4px rgba(232, 28, 255, 0.5), 0 0 8px rgba(232, 28, 255, 0.3);
+    }
+}
+
+/* Apply a noticeable but elegant glow effect to the third column header */
+th:nth-child(3) {
+    animation: subtle-glow 2s ease-in-out infinite;
+    color: #e81cff;
+    font-weight: bold; /* Make it stand out more */
+}
 
     </style>
 </head>
