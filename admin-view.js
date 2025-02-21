@@ -164,7 +164,7 @@ const displayCurrentPage = () => {
 
     tr.innerHTML = `
             <td>${formatDate(data.timestamp)}</td>
-            <td style="color:#c587cc;>${data.storeNumber}</td>
+            <td style="color:#c587cc;">${data.storeNumber}</td>
             <td class="incident-types">${createIncidentTypeBadges(
               data.incidentTypes
             )}</td>
