@@ -51,6 +51,8 @@
             text-align: left;
             border-bottom: 1px solid #414141;
             height: 48px;
+            max-height: 48px; /* Ensure height doesn't exceed */
+    box-sizing: border-box;
         }
 
         th {
@@ -79,8 +81,8 @@
         }
 
         .details-cell {
-            max-width: 50px;
-            white-space: nowrap;
+            max-width: 100px;
+            white-space: nowrap !important;
             overflow: hidden;
             text-overflow: ellipsis;
             cursor: pointer;
@@ -545,6 +547,20 @@ tr {
         .filter-group {
             margin-bottom: 10px;
         }
+.actions {
+    display: flex;
+    flex-direction: row;
+    /* gap: 4px; */
+    /* max-height: 100%; */
+    align-items: center;
+}
+
+/* Adjust buttons to fit within the row height */
+.status-button, .delete-button {
+    padding: 4px 8px;
+    font-size: 12px;
+    white-space: nowrap;
+}
 
         .actions button {
             background-color: #313131;
