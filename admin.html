@@ -893,7 +893,8 @@ tr {
 .status-button:hover {
     background-color: rgba(64, 201, 255, 0.4);
 }
-@keyframes subtle-glow {
+
+/* @keyframes subtle-glow {
     0% {
         text-shadow: 0 0 4px rgba(232, 28, 255, 0.5), 0 0 8px rgba(232, 28, 255, 0.3);
     }
@@ -903,7 +904,107 @@ tr {
     100% {
         text-shadow: 0 0 4px rgba(232, 28, 255, 0.5), 0 0 8px rgba(232, 28, 255, 0.3);
     }
+} */
+
+/* glowing css i am applying */
+
+/* Border glow animation */
+@keyframes border-glow {
+    0% {
+        border-color: rgba(255, 0, 0, 0.6);
+        box-shadow: 0 0 3px rgba(255, 0, 0, 0.4),
+                    inset 0 0 5px rgba(255, 0, 0, 0.4);
+    }
+    50% {
+        border-color: rgba(255, 0, 0, 0.9);
+        box-shadow: 0 0 7px rgba(255, 0, 0, 0.7),
+                    inset 0 0 10px rgba(255, 0, 0, 0.7);
+    }
+    100% {
+        border-color: rgba(255, 0, 0, 0.6);
+        box-shadow: 0 0 3px rgba(255, 0, 0, 0.4),
+                    inset 0 0 5px rgba(255, 0, 0, 0.4);
+    }
 }
+
+/* Incident type styles with glowing border */
+.incident-type {
+    display: inline-block;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 500;
+    margin-right: 8px;
+    border: 1.5px solid rgba(255, 0, 0, 0.7);
+    animation: border-glow 2s ease-in-out infinite;
+    position: relative;
+}
+
+/* Remove previous text shadow effects */
+th:nth-child(3) {
+    font-weight: bold;
+    color: #ff3333;
+}
+
+/* Keep the background colors but remove their animation */
+.incident-type[data-type="shoplifting"] {
+    background-color: rgba(244, 67, 54, 0.2);
+    color: #ff5252;
+}
+
+.incident-type[data-type="robbery"] {
+    background-color: rgba(136, 14, 79, 0.2);
+    color: #d33388;
+}
+
+.incident-type[data-type="beer-run"] {
+    background-color: rgba(255, 152, 0, 0.2);
+    color: #ff9800;
+}
+
+.incident-type[data-type="property-damage"] {
+    background-color: rgba(156, 39, 176, 0.2);
+    color: #9c27b0;
+}
+
+.incident-type[data-type="harassment"] {
+    background-color: rgba(33, 150, 243, 0.2);
+    color: #2196f3;
+}
+
+.incident-type[data-type="injury"] {
+    background-color: rgba(255, 193, 7, 0.2);
+    color: #ffc107;
+}
+
+/* Mobile-specific adjustments */
+@media (max-width: 768px) {
+    /* Enhanced border glow for mobile */
+    @keyframes border-glow-mobile {
+        0% {
+            border-color: rgba(255, 0, 0, 0.7);
+            box-shadow: 0 0 5px rgba(255, 0, 0, 0.5),
+                        inset 0 0 7px rgba(255, 0, 0, 0.5);
+        }
+        50% {
+            border-color: rgba(255, 0, 0, 1);
+            box-shadow: 0 0 12px rgba(255, 0, 0, 0.8),
+                        inset 0 0 8px rgba(255, 0, 0, 0.8);
+        }
+        100% {
+            border-color: rgba(255, 0, 0, 0.7);
+            box-shadow: 0 0 5px rgba(255, 0, 0, 0.5),
+                        inset 0 0 7px rgba(255, 0, 0, 0.5);
+        }
+    }
+
+    .incident-type {
+        animation: border-glow-mobile 2s ease-in-out infinite;
+        border-width: 2px;
+    }
+}
+
+/* delete up to here */
 
 /* Apply a noticeable but elegant glow effect to the third column header */
 th:nth-child(3) {
