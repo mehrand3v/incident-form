@@ -402,7 +402,7 @@ incidentForm.addEventListener("submit", async (e) => {
     // Show success notification
     showNotification("Incident report submitted successfully");
 
- 
+
 
     // Reset specific fields
     checkboxes.forEach((checkbox) => (checkbox.checked = false));
@@ -437,7 +437,7 @@ function createSuccessScreen(storeNumber) {
                 <button class="success-button primary" onclick="window.location.reload()">
                     Submit Another Report
                 </button>
-                <a href="/" class="success-button secondary" style="text-decoration: none">
+                <a href="/" class="success-button secondary">
                     Return to Homepage
                 </a>
             </div>
