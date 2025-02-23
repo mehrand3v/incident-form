@@ -382,12 +382,27 @@ incidentForm.addEventListener("submit", async (e) => {
       incidentData
     );
     console.log("Document written with ID: ", docRef.id);
+  // Get the form container
+    const formContainer = document.querySelector('.form-container');
 
+    // Save store number
+    const storeNumber = storeNumberInput.value;
+
+    // Clear the container
+    formContainer.innerHTML = '';
+
+    // Add success screen
+    formContainer.innerHTML = createSuccessScreen(storeNumber);
+
+    // Remove the admin button if it exists
+    const adminButton = document.querySelector('div[style*="position: fixed"]');
+    if (adminButton) {
+        adminButton.remove();
+    }
     // Show success notification
     showNotification("Incident report submitted successfully");
 
-    // Save store number before resetting form
-    const storeNumber = storeNumberInput.value;
+ 
 
     // Reset specific fields
     checkboxes.forEach((checkbox) => (checkbox.checked = false));
@@ -405,3 +420,27 @@ incidentForm.addEventListener("submit", async (e) => {
     showNotification("Error submitting report. Please try again.", 5000);
   }
 });
+
+function createSuccessScreen(storeNumber) {
+  return `
+        <div class="success-screen">
+            <svg class="success-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M22 4L12 14.01l-3-3" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <h2 class="success-title">Report Submitted Successfully</h2>
+            <div>
+                <p class="success-message">Thank you for submitting your incident report.</p>
+                <p class="success-message">Store #${storeNumber}</p>
+            </div>
+            <div class="success-buttons">
+                <button class="success-button primary" onclick="window.location.reload()">
+                    Submit Another Report
+                </button>
+                <a href="/" class="success-button secondary" style="text-decoration: none">
+                    Return to Homepage
+                </a>
+            </div>
+        </div>
+    `;
+}
