@@ -85,12 +85,14 @@
             text-decoration: none;
             color: #fff;
             background: linear-gradient(45deg, #0ce39a, #69007f, #fc0987);
-            padding: 14px 25px;
+            padding: 12px 20px;
             border-radius: 10px;
-            font-size: 1.25em;
+            font-size: 1.1em;
             cursor: pointer;
             display: inline-block;
             margin: 10px;
+            white-space: nowrap;
+            min-width: fit-content;
         }
 
         .button span {
@@ -130,8 +132,10 @@
             width: 100%;
             max-width: 500px;
             display: flex;
-            justify-content: flex-end;
+            justify-content: center;
             margin-bottom: 20px;
+            gap: 15px;
+            flex-wrap: wrap;
         }
 
         .download-btn {
@@ -155,12 +159,9 @@
             margin: 0 auto;
         }
 
-        /* New styles for print button and print layout */
         .print-btn {
             background: none;
-            /* border: 1px solid #40c9ff;
-            color: #40c9ff; */
-             border: 1px solid #e81cff;
+            border: 1px solid #e81cff;
             color: #e81cff;
             padding: 8px 16px;
             border-radius: 8px;
@@ -171,8 +172,6 @@
         }
 
         .print-btn:hover {
-            /* background: #40c9ff;
-            color: white; */
             background: #e81cff;
             color: white;
         }
@@ -188,7 +187,6 @@
             background: white;
             padding: 40px;
             border-radius: 20px;
-            /* border: 4px solid #40c9ff; */
             border: 4px solid #e81cff;
             display: inline-block;
             margin: 20px auto;
@@ -221,126 +219,138 @@
                 align-items: center;
             }
         }
-        /* see if below styles work */
-        /* Common mobile styles */
-@media screen and (max-width: 480px) {
-  /* Form container adjustments */
-  .form-container {
-    width: 90% !important;
-    max-width: none !important;
-    padding: 20px 16px !important;
-    margin: 10px !important;
-    gap: 16px !important;
-  }
 
-  /* Title adjustments */
-  .form-container h2,
-  .title {
-    font-size: 20px !important;
-    margin-bottom: 16px !important;
-  }
+        @media screen and (max-width: 480px) {
+            .form-container {
+                width: 90% !important;
+                max-width: none !important;
+                padding: 20px 16px !important;
+                margin: 10px !important;
+                gap: 16px !important;
+            }
 
-  /* Form group spacing */
-  .form-group {
-    gap: 8px !important;
-    margin-top: 12px !important;
-  }
+            .form-container h2,
+            .title {
+                font-size: 20px !important;
+                margin-bottom: 16px !important;
+            }
 
-  /* Checkbox container adjustments */
-  .checkbox-container {
-    grid-template-columns: 1fr !important;
-    gap: 12px !important;
-    padding: 4px !important;
-  }
+            .navbar {
+                padding: 5px !important;
+                justify-content: center !important;
+                gap: 8px !important;
+                flex-direction: row !important;
+            }
 
-  /* Checkbox size adjustments */
-  .checkbox-flip {
-    width: 36px !important;
-    height: 36px !important;
-  }
+            .button {
+                padding: 8px 16px !important;
+                font-size: 0.85em !important;
+                margin: 5px !important;
+                transform: none !important;
+                min-width: auto !important;
+                width: auto !important;
+                white-space: nowrap !important;
+            }
 
-  /* Text size adjustments */
-  .checkbox-text {
-    font-size: 13px !important;
-  }
+            .navbar .button {
+                transform: none !important;
+            }
 
-  /* Input and textarea adjustments */
-  .form-group input[type="text"],
-  .form-group textarea {
-    padding: 8px 12px !important;
-    font-size: 13px !important;
-  }
+            .form-group {
+                gap: 8px !important;
+                margin-top: 12px !important;
+            }
 
-  /* Button adjustments */
-  .form-submit-btn,
-  .button {
-    width: 100% !important;
-    padding: 10px 16px !important;
-    font-size: 14px !important;
-  }
+            .checkbox-container {
+                grid-template-columns: 1fr !important;
+                gap: 12px !important;
+                padding: 4px !important;
+            }
 
-  /* QR code page specific adjustments */
-  .container {
-    width: 90% !important;
-    max-width: none !important;
-    padding: 20px 16px !important;
-    margin: 10px !important;
-  }
+            .checkbox-flip {
+                width: 36px !important;
+                height: 36px !important;
+            }
 
-  .qr-container {
-    padding: 12px !important;
-  }
+            .checkbox-text {
+                font-size: 13px !important;
+            }
 
-  #qrCode img,
-  #qrCode canvas {
-    width: 200px !important;
-    height: 200px !important;
-  }
+            .form-group input[type="text"],
+            .form-group textarea {
+                padding: 8px 12px !important;
+                font-size: 13px !important;
+            }
 
-  .instructions {
-    font-size: 13px !important;
-    margin: 12px 0 !important;
-  }
+            .form-submit-btn {
+                width: 100% !important;
+                padding: 10px 16px !important;
+                font-size: 14px !important;
+            }
 
-  .navbar {
-    padding: 10px !important;
-    justify-content: center !important;
-  }
+            .container {
+                width: 90% !important;
+                max-width: none !important;
+                padding: 20px 16px !important;
+                margin: 10px !important;
+            }
 
-  /* Print layout adjustments */
-  .print-layout .qr-container {
-    padding: 20px !important;
-  }
+            .qr-container {
+                padding: 12px !important;
+            }
 
-  #printQrCode img,
-  #printQrCode canvas {
-    width: 300px !important;
-    height: 300px !important;
-  }
+            #qrCode img,
+            #qrCode canvas {
+                width: 200px !important;
+                height: 200px !important;
+            }
 
-  /* Body scroll fix */
-  html, body {
-    overflow-y: auto !important;
-    height: 100% !important;
-  }
+            .instructions {
+                font-size: 13px !important;
+                margin: 12px 0 !important;
+            }
 
-  /* Admin button positioning */
-  body > div:first-of-type {
-    position: relative !important;
-    top: 0 !important;
-    left: 0 !important;
-    width: 100% !important;
-    display: flex !important;
-    justify-content: center !important;
-    padding: 10px !important;
-  }
-}
-        /* up to here */
+            .print-layout .qr-container {
+                padding: 20px !important;
+            }
+
+            #printQrCode img,
+            #printQrCode canvas {
+                width: 300px !important;
+                height: 300px !important;
+            }
+
+            html,
+            body {
+                overflow-y: auto !important;
+                height: 100% !important;
+            }
+
+            body>div:first-of-type {
+                position: relative !important;
+                top: 0 !important;
+                left: 0 !important;
+                width: 100% !important;
+                display: flex !important;
+                justify-content: center !important;
+                padding: 10px !important;
+            }
+
+            .download-btn,
+            .print-btn {
+                padding: 6px 12px !important;
+                font-size: 12px !important;
+                margin-top: 15px !important;
+            }
+        }
     </style>
 </head>
 
 <body>
     <div class="navbar">
+        <a href="signin.html" class="button">
+            <span>Report Incident</span>
+        </a>
         <a href="admin.html" class="button">
             <span>Admin Dashboard</span>
         </a>
@@ -403,16 +413,19 @@
             link.href = canvas.toDataURL("image/png");
             link.click();
         }
-document.querySelector('.navbar a').addEventListener('click', (e) => {
-    e.preventDefault();
 
-    // Check if already authenticated
-    if (sessionStorage.getItem('adminAuthenticated') === 'true') {
-        window.location.href = 'admin.html';
-    } else {
-        window.location.href = 'admin-login.html';
-    }
-});
+        // Add event listener for admin dashboard button
+        document.querySelector('.navbar a:nth-child(2)').addEventListener('click', (e) => {
+            e.preventDefault();
+
+            // Check if already authenticated
+            if (sessionStorage.getItem('adminAuthenticated') === 'true') {
+                window.location.href = 'admin.html';
+            } else {
+                window.location.href = 'admin-login.html';
+            }
+        });
+
         // Function to print QR code
         function printQR() {
             window.print();
