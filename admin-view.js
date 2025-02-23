@@ -463,11 +463,11 @@ const generatePdfReport = () => {
     },
     columnStyles: {
       0: { cellWidth: 20 }, // Date
-      1: { cellWidth: 20, overflow: "linebreak", textColor:"blue" }, // Store
-      2: { cellWidth: 26 }, // Incident Types
+      1: { cellWidth: 20, overflow: "linebreak" }, // Store
+      2: { cellWidth: 26, halign: "center",textColor:"white" }, // Incident Types
       3: { cellWidth: 65 }, // Details
       4: { cellWidth: 20 }, // Status
-      5: { cellWidth: 30, halign: "center", textColor: "#a540d1" }, // Police Report # (Adjust the width as needed)
+      5: { cellWidth: 30, halign: "center", textColor: "blue" }, // Police Report # (Adjust the width as needed)
     },
     headStyles: {
       fillColor: [232, 28, 255], // Your purple theme color
@@ -477,6 +477,36 @@ const generatePdfReport = () => {
       fillColor: [245, 245, 245],
     },
     rowPageBreak: "avoid",
+    didParseCell: (data) => {
+      // Apply conditional coloring for the "Incident Type" column (index 2)
+      if (data.column.index === 2) {
+        const incidentTypes = data.cell.raw.split(", ");
+        let fillColor = null;
+
+        // Define colors for each incident type
+        const incidentTypeColors = {
+          shoplifting: "#FF5733", // Light red
+          robbery: "#C70039", // Dark magenta
+          "beer-run": "#FFC300", // Orange
+          "property-damage": "#a540d1", // Purple
+          injury: [255, 193, 7, 0.2], // Yellow
+          // Add more incident types and colors as needed
+        };
+
+        // Check if any of the incident types match the defined colors
+        for (const type of incidentTypes) {
+          if (incidentTypeColors[type.toLowerCase()]) {
+            fillColor = incidentTypeColors[type.toLowerCase()];
+            break; // Use the first matching color
+          }
+        }
+
+        // Apply the background color to the cell
+        if (fillColor) {
+          data.cell.styles.fillColor = fillColor;
+        }
+      }
+    },
     didDrawPage: function (data) {
       // Add page number
       doc.setFontSize(8);
