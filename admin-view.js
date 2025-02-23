@@ -505,6 +505,9 @@ const generatePdfReport = () => {
         if (fillColor) {
           data.cell.styles.fillColor = fillColor;
         }
+        // Apply letter spacing to the incident types text
+        // data.cell.styles.fontStyle = "bold"; 
+
       }
     },
     didDrawPage: function (data) {
