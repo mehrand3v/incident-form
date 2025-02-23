@@ -4,7 +4,9 @@ import {
   collection,
   query,
   orderBy,
-  onSnapshot
+  onSnapshot,
+  doc,
+  updateDoc
 } from "https://www.gstatic.com/firebasejs/11.3.1/firebase-firestore.js";
 
 // Your Firebase configuration
@@ -158,24 +160,29 @@ const displayCurrentPage = () => {
     start + itemsPerPage
   );
 
-  paginatedIncidents.forEach((doc) => {
-    const data = doc.data();
-    const tr = document.createElement("tr");
+ paginatedIncidents.forEach((doc) => {
+   const data = doc.data();
+   const tr = document.createElement("tr");
 
-    tr.innerHTML = `
-            <td>${formatDate(data.timestamp)}</td>
-            <td style="color:#c587cc;">${data.storeNumber}</td>
-            <td class="incident-types">${createIncidentTypeBadges(
-              data.incidentTypes
-            )}</td>
-            <td class="details-cell" onclick="window.showDetails('${encodeURIComponent(
-              data.details
-            )}')">${data.details}</td>
-            <td class="status-${data.status}">${data.status}</td>
-        `;
+tr.innerHTML = `
+    <td>${formatDate(data.timestamp)}</td>
+    <td style="color:#c587cc;">${data.storeNumber}</td>
+    <td class="incident-types">${createIncidentTypeBadges(
+      data.incidentTypes
+    )}</td>
+    <td class="details-cell" onclick="window.showDetails('${encodeURIComponent(
+      data.details
+    )}')">${data.details}</td>
+    <td>${data.status}</td>
+    <td class="police-report-cell"></td>
+`;
 
-    tbody.appendChild(tr);
-  });
+   tbody.appendChild(tr);
+
+   // Initialize police report cell
+   const policeReportCell = tr.querySelector(".police-report-cell");
+   makePoliceReportEditable(policeReportCell, doc.id, data.policeReport);
+ });
 };
 
 const filterIncidents = (incidents) => {
@@ -435,13 +442,23 @@ const generatePdfReport = () => {
       data.storeNumber,
       Array.isArray(data.incidentTypes) ? data.incidentTypes.join(", ") : "",
       data.details,
+      data.policeReport || "N/A",
       data.status,
     ];
   });
 
   // Generate table
   doc.autoTable({
-    head: [["Date", "Store", "Incident Types", "Details", "Status"]],
+    head: [
+      [
+        "Date",
+        "Store",
+        "Incident Type",
+        "Details",
+        "Status",
+        "Police Report #",
+      ],
+    ],
     body: tableData,
     startY: 45,
     styles: {
@@ -450,7 +467,7 @@ const generatePdfReport = () => {
     },
     columnStyles: {
       0: { cellWidth: 30 }, // Date
-      1: { cellWidth: 20, overflow: 'linebreak' }, // Store
+      1: { cellWidth: 20, overflow: "linebreak" }, // Store
       2: { cellWidth: 30 }, // Incident Types
       3: { cellWidth: 75 }, // Details
       4: { cellWidth: 20 }, // Status
@@ -483,3 +500,84 @@ document.addEventListener("DOMContentLoaded", () => {
   loadIncidents();
   setupPdfGeneration();
 });
+// Add this function to handle police report editing
+const makePoliceReportEditable = (cell, docId, currentValue) => {
+    const text = currentValue || 'N/A';
+    cell.innerHTML = `
+        <div class="police-report-container">
+            <span class="police-report-text" style="color: ${currentValue ? '#c587cc' : '#666'}">${text}</span>
+            <button class="edit-button">Edit</button>
+        </div>
+    `;
+
+    const editButton = cell.querySelector('.edit-button');
+    editButton.onclick = (e) => {
+        e.stopPropagation();
+        const currentText = cell.querySelector('.police-report-text').textContent;
+
+        cell.innerHTML = `
+            <div class="police-report-container">
+                <input type="text"
+                    value="${currentText === 'N/A' ? '' : currentText}"
+                    class="police-report-input"
+                    placeholder="Enter report #">
+                <button class="save-button">Save</button>
+            </div>
+        `;
+
+        const input = cell.querySelector('.police-report-input');
+        input.focus();
+
+        const saveButton = cell.querySelector('.save-button');
+        const saveChanges = async () => {
+            const newValue = input.value.trim();
+
+            try {
+                const docRef = doc(db, "incident-reports", docId);
+                await updateDoc(docRef, {
+                    policeReport: newValue
+                });
+
+                createNotification('Police report number updated successfully', 'success');
+                makePoliceReportEditable(cell, docId, newValue);
+            } catch (error) {
+                console.error("Error updating police report number:", error);
+                createNotification('Failed to update police report number', 'error');
+            }
+        };
+
+        saveButton.onclick = (e) => {
+            e.stopPropagation();
+            saveChanges();
+        };
+
+        input.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                saveChanges();
+            }
+        });
+    };
+};
+
+// Add this function to create notifications
+const createNotification = (message, type = 'success') => {
+    const notification = document.createElement('div');
+    notification.className = `notification ${type}`;
+    notification.innerHTML = `
+        <div class="notification-content">${message}</div>
+        <button class="notification-close">&times;</button>
+    `;
+
+    document.body.appendChild(notification);
+    setTimeout(() => notification.classList.add('show'), 10);
+
+    setTimeout(() => {
+        notification.classList.remove('show');
+        setTimeout(() => notification.remove(), 300);
+    }, 3000);
+
+    notification.querySelector('.notification-close').onclick = () => {
+        notification.classList.remove('show');
+        setTimeout(() => notification.remove(), 300);
+    };
+};

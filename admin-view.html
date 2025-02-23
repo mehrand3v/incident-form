@@ -878,6 +878,49 @@ tr {
 .status-button:hover {
     background-color: rgba(64, 201, 255, 0.4);
 }
+.police-report-cell {
+    position: relative;
+}
+
+.police-report-input {
+    background-color: #2a2a2a;
+    border: 2px solid #e81cff;
+    color: white;
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-size: 14px;
+    width: 120px;
+    transition: all 0.3s ease;
+}
+
+.police-report-input:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(232, 28, 255, 0.2);
+}
+
+.edit-button, .save-button {
+    background-color: rgba(64, 201, 255, 0.2);
+    color: #40c9ff;
+    border: none;
+    padding: 6px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 12px;
+}
+
+.edit-button:hover {
+    background-color: rgba(64, 201, 255, 0.4);
+}
+
+.save-button {
+    background-color: rgba(0, 255, 0, 0.2);
+    color: #00ff00;
+}
+
+.save-button:hover {
+    background-color: rgba(0, 255, 0, 0.4);
+}
     </style>
 </head>
 
@@ -952,6 +995,7 @@ tr {
                         <th>Incident Type</th>
                         <th>Details</th>
                         <th>Status</th>
+                        <th>Police Report #</th>
                         <!-- <th>Actions</th> -->
                     </tr>
                 </thead>
