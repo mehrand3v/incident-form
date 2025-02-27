@@ -275,6 +275,81 @@ modalStyle.textContent = `
     border: none;
     color: white;
   }
+    .success-button {
+  display: block;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  width: 100%;
+  text-align: center;
+  box-sizing: border-box;
+  text-decoration: none;
+}
+
+.success-screen {
+  animation: fadeSlideIn 0.5s ease-out;
+}
+
+@keyframes fadeSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.success-button.primary:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(54, 181, 74, 0.2);
+}
+
+.success-button.secondary:hover {
+  background: #414141;
+  color: white;
+  transform: translateY(-1px);
+}
+
+.success-button:active {
+  transform: translateY(1px);
+}
+
+.success-button:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.success-button:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(232, 28, 255, 0.3);
+}
+
+.success-button:focus:not(:focus-visible) {
+  box-shadow: none;
+}
+
+@media screen and (max-width: 480px) {
+  .success-screen {
+    padding: 16px 8px;
+  }
+
+  .success-title {
+    font-size: 20px;
+  }
+
+  .success-buttons {
+    width: 100%;
+    max-width: none;
+    padding: 0 8px;
+  }
+}
 `;
 document.head.appendChild(modalStyle);
 
@@ -428,9 +503,9 @@ function createSuccessScreen(storeNumber) {
                 <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" stroke-linecap="round" stroke-linejoin="round"/>
                 <path d="M22 4L12 14.01l-3-3" stroke-linecap="round" stroke-linejoin="round"/>
             </svg>
-            <h2 class="success-title">Report Submitted Successfully</h2>
+            <h2 class="success-title">Report Submitted</h2>
             <div>
-                <p class="success-message">Thank you for submitting your incident report.</p>
+                <p class="success-message">Your incident report has been successfully recorded.</p>
                 <p class="success-message">Store #${storeNumber}</p>
             </div>
             <div class="success-buttons">

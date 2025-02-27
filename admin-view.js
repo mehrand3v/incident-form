@@ -173,7 +173,7 @@ const displayCurrentPage = () => {
     <td class="details-cell" onclick="window.showDetails('${encodeURIComponent(
       data.details
     )}')">${data.details}</td>
-    <td>${data.status}</td>
+    <td class="status-${data.status}">${data.status}</td>
     <td class="police-report-cell"></td>
 `;
 
@@ -506,7 +506,7 @@ const generatePdfReport = () => {
           data.cell.styles.fillColor = fillColor;
         }
         // Apply letter spacing to the incident types text
-        // data.cell.styles.fontStyle = "bold"; 
+        // data.cell.styles.fontStyle = "bold";
 
       }
     },
